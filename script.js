@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setUIState(UI_STATE.BREATHING);
         animationStartTime = performance.now();
         lastAnimationFrameTimestamp = animationStartTime;
-        phaseStartTime = animationStartTime;
+        phaseStartTime = animationStartTime; // Inicializa phaseStartTime aqui
         updateBreathingPhase(); // Configura a primeira fase
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
         animationFrameId = requestAnimationFrame(animationLoop);
@@ -524,7 +524,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
         if (currentPhaseDuration > 0) {
             phaseTimeoutId = setTimeout(() => {
-                if (isBreathing) { currentPhase = nextPhase; phaseStartTime = performance.now(); updateBreathingPhase(); }
+                if (isBreathing) { 
+                    currentPhase = nextPhase; 
+                    phaseStartTime = performance.now(); // Atualiza phaseStartTime ao iniciar nova fase
+                    updateBreathingPhase(); 
+                }
             }, currentPhaseDuration * 1000);
         } else { console.warn("Duração da fase é zero."); }
     } // Fim updateBreathingPhase
@@ -705,7 +709,46 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSaibaMais(); // Adiciona chamada inicial
     window.addEventListener('resize', updateBoxDimensions);
     console.log("App de Respiração inicializado (v8.1 FINAL).");
-    }); // Fim do DOMContentLoaded
+
+    function updatePhaseMarkers(timestamp) {
+        const markers = document.querySelectorAll('.phase-marker');
+        if (!markers.length || !isBreathing) return;
+
+        const timeIntoPhaseSeconds = (timestamp - phaseStartTime) / 1000;
+        const phaseProgress = (currentPhaseDuration > 0) ? 
+            Math.min(1, timeIntoPhaseSeconds / currentPhaseDuration) : 0;
+        
+        markers.forEach((marker) => {
+            marker.classList.remove('active');
+            const fill = marker.querySelector('.marker-fill');
+            if (fill) {
+                fill.style.width = '0%';
+            }
+        });
+
+        if (currentPhase >= 0 && currentPhase < markers.length) {
+            const currentMarker = markers[currentPhase];
+            if (currentMarker) {
+                currentMarker.classList.add('active');
+                const fill = currentMarker.querySelector('.marker-fill');
+                if (fill) {
+                    fill.style.width = `${phaseProgress * 100}%`;
+                }
+            }
+        }
+    }
+
+    function resetPhaseMarkers() {
+        const markers = document.querySelectorAll('.phase-marker');
+        markers.forEach(marker => {
+            marker.classList.remove('active');
+            const fill = marker.querySelector('.marker-fill');
+            if (fill) {
+                fill.style.width = '0%';
+            }
+        });
+    }
+}); // Fim do DOMContentLoaded
 
 /** Atualiza o conteúdo da caixa Saiba Mais baseado na técnica selecionada */
 function updateSaibaMais() {
@@ -723,7 +766,6 @@ function updateSaibaMais() {
     
     const techniqueTitle = techniqueTitles[currentTechnique] || 'Técnica de Respiração';
     
-    // Atualiza o conteúdo sem lógica de expansão
     saibaMaisEl.innerHTML = `
         <div class="saiba-mais-header">
             <span class="info-icon">ⓘ</span>
@@ -735,50 +777,13 @@ function updateSaibaMais() {
     `;
 }
 
-// Remova event listener de clique do saibaMais
-const saibaMais = document.getElementById('saiba-mais');
-if (saibaMais) {
-    // Remova o evento de clique existente
-    saibaMais.onclick = null;
-}
-
-function updatePhaseMarkers(timestamp) {
-    const markers = document.querySelectorAll('.phase-marker');
-    if (!markers.length) return;
-
-    const timeIntoPhaseSeconds = (timestamp - phaseStartTime) / 1000;
-    const phaseProgress = Math.min(1, timeIntoPhaseSeconds / currentPhaseDuration);
-    
-    markers.forEach((marker, index) => {
-        // Remove active de todos primeiro
-        marker.classList.remove('active');
-        const fill = marker.querySelector('.marker-fill');
-        if (fill) {
-            fill.style.width = '0%';
-        }
-    });
-
-    // Ativa o marcador da fase atual
-    const currentMarker = markers[currentPhase];
-    if (currentMarker) {
-        currentMarker.classList.add('active');
-        const fill = currentMarker.querySelector('.marker-fill');
-        if (fill) {
-            fill.style.width = `${phaseProgress * 100}%`;
-        }
+// Remova qualquer event listener existente do saibaMais
+document.addEventListener('DOMContentLoaded', () => {
+    const saibaMais = document.getElementById('saiba-mais');
+    if (saibaMais) {
+        saibaMais.onclick = null; // Limpa qualquer onclick existente
     }
-}
-
-function resetPhaseMarkers() {
-    const markers = document.querySelectorAll('.phase-marker');
-    markers.forEach(marker => {
-        marker.classList.remove('active');
-        const fill = marker.querySelector('.marker-fill');
-        if (fill) {
-            fill.style.width = '0%';
-        }
-    });
-}
+});
 
 /** Define o conteúdo específico para cada técnica */
 function getTechniqueContent(technique) {
