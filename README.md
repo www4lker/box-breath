@@ -2,7 +2,9 @@
 
 **"Pause a tela de trabalho, se encontre com ajuda da tela de respiração."**
 
-![Imgur](https://imgur.com/aujpYiN)
+
+![screenshot](https://i.postimg.cc/Y0gysQ6X/image.png)
+[Acesse aqui](http://prana.walker.eco.br/)
 
 ## Sobre o Projeto
 
