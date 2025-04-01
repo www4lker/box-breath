@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const PHASE = { INHALE: 0, HOLD_IN: 1, EXHALE: 2, HOLD_OUT: 3 }; // Box Phases
     const TOTAL_PHASES_BOX = 4;
     const UI_STATE = { IDLE: 'idle', PREPARING: 'preparing', BREATHING: 'breathing', FINISHED: 'finished' };
+    const SOUND_VOLUME_MULTIPLIER = 0.2; // Reduz 80% do volume
     // Categorias para paleta geral CSS
     const techniqueCategories = {
         box: 'focus', alternate: 'focus', // Alternate usa paleta 'focus' geral
@@ -50,6 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPhaseDuration = 0; let animationStartTime = 0; let lastAnimationFrameTimestamp = 0;
     let phaseStartTime = 0; let audioCtx = null; const sounds = { inhale: null, exhale: null, hold: null, vertex: null };
     let boxRect = null; let containerRect = null;
+    let isMuted = localStorage.getItem('mutePreference') === 'true';
+
+    function updateMuteButton() {
+        const muteBtn = document.getElementById('mute-btn');
+        if (muteBtn) {
+            muteBtn.textContent = isMuted ? 'Som: Off' : 'Som: On';
+        }
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        localStorage.setItem('mutePreference', isMuted);
+        updateMuteButton();
+    }
     
     // --- Funções Auxiliares ---
     /** Converte número para numeral romano (simplificado para 1-10) */
@@ -74,17 +89,37 @@ document.addEventListener('DOMContentLoaded', () => {
      }
     /** Toca um som específico com rampas de frequência e ganho */
     function playSound(soundData, durationSeconds) {
+        if (isMuted) return;
         if (!audioCtx || !soundData || !soundData.gainNode) return;
-        const { oscillator, gainNode, baseFreq, targetFreq } = soundData; const now = audioCtx.currentTime;
-        oscillator.frequency.cancelScheduledValues(now); oscillator.frequency.setValueAtTime(baseFreq, now); if (targetFreq !== null && durationSeconds > 0.05) { oscillator.frequency.linearRampToValueAtTime(targetFreq, now + durationSeconds); }
-        gainNode.gain.cancelScheduledValues(now); gainNode.gain.setValueAtTime(0, now); gainNode.gain.linearRampToValueAtTime(0.15, now + 0.05); if (durationSeconds > 0.15) { gainNode.gain.setValueAtTime(0.15, now + durationSeconds - 0.1); gainNode.gain.linearRampToValueAtTime(0, now + durationSeconds); } else { gainNode.gain.linearRampToValueAtTime(0, now + durationSeconds); }
+        const { oscillator, gainNode, baseFreq, targetFreq } = soundData;
+        const now = audioCtx.currentTime;
+        oscillator.frequency.cancelScheduledValues(now);
+        oscillator.frequency.setValueAtTime(baseFreq, now);
+        if (targetFreq !== null && durationSeconds > 0.05) {
+            oscillator.frequency.linearRampToValueAtTime(targetFreq, now + durationSeconds);
+        }
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.15 * SOUND_VOLUME_MULTIPLIER, now + 0.05);
+        if (durationSeconds > 0.15) {
+            gainNode.gain.setValueAtTime(0.15 * SOUND_VOLUME_MULTIPLIER, now + durationSeconds - 0.1);
+            gainNode.gain.linearRampToValueAtTime(0, now + durationSeconds);
+        } else {
+            gainNode.gain.linearRampToValueAtTime(0, now + durationSeconds);
+        }
     }
     /** Toca um som curto e pontual (beep de transição) */
     function playVertexSound() {
+        if (isMuted) return;
         if (!audioCtx || !sounds.vertex || !sounds.vertex.gainNode) return;
-        const { oscillator, gainNode, baseFreq } = sounds.vertex; const now = audioCtx.currentTime; oscillator.frequency.setValueAtTime(baseFreq, now);
-        gainNode.gain.cancelScheduledValues(now); gainNode.gain.setValueAtTime(0, now); gainNode.gain.linearRampToValueAtTime(0.25, now + 0.01); gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
-     }
+        const { oscillator, gainNode, baseFreq } = sounds.vertex;
+        const now = audioCtx.currentTime;
+        oscillator.frequency.setValueAtTime(baseFreq, now);
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.25 * SOUND_VOLUME_MULTIPLIER, now + 0.01);
+        gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
+    }
     /** Para todos os sons suavemente (fade out) */
     function stopAllSounds() {
         if (!audioCtx) return; const now = audioCtx.currentTime;
@@ -570,6 +605,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(durationSelect) durationSelect.addEventListener('change', (event) => { if (currentUIState === UI_STATE.IDLE && timerDisplay){ timerDisplay.textContent = formatTime(parseInt(event.target.value, 10)); } });
     if(toggleAdvancedBtn && advancedControls) toggleAdvancedBtn.addEventListener('click', () => { const isHidden = advancedControls.style.display === 'none' || advancedControls.style.display === ''; advancedControls.style.display = isHidden ? 'block' : 'none'; toggleAdvancedBtn.textContent = isHidden ? 'Esconder Controles Avançados' : 'Mostrar Controles Avançados'; if(isHidden){ toggleAdvancedControlsVisibility(selectedTechnique); } });
     if(phaseDurationInput && phaseDurationValue) phaseDurationInput.addEventListener('input', () => { if(phaseDurationValue) phaseDurationValue.textContent = phaseDurationInput.value; });
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) muteBtn.addEventListener('click', toggleMute);
+    updateMuteButton();
     
     // --- Inicialização ---
     const initialTheme = getInitialTheme(); applyTheme(initialTheme);
