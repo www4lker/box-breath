@@ -473,7 +473,9 @@ button {
 /* Estilo para caixa Saiba Mais */
 .saiba-mais {
     margin-top: 20px;
-    width: 100%;
+    width: 100%; /* Garante que ocupe toda largura disponível */
+    max-width: 100%; /* Remove limitação fixa */
+    box-sizing: border-box; /* Inclui padding no cálculo da largura */
     padding: 15px;
     background-color: var(--intermediaria);
     border: 1px solid var(--input-border);
@@ -484,25 +486,24 @@ button {
 }
 
 .saiba-mais-header {
+    width: 100%;
     padding: 15px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Permite quebra em telas pequenas */
     gap: 10px;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: var(--texto-escuro);
-    border-bottom: 1px solid var(--input-border);
-    margin-bottom: 15px;
 }
 
 .saiba-mais-content {
     padding: 15px;
     width: 100%;
+    overflow-x: hidden; /* Evita scroll horizontal */
 }
 
-.info-icon {
-    color: var(--destaque-1);
-    font-size: 1.2em;
+.saiba-mais-content ol {
+    padding-left: 20px; /* Reduz padding da lista */
+    margin: 10px 0;
 }
 
 /* Media queries para telas menores */
@@ -548,6 +549,94 @@ button {
     background-color: transparent;
 }
 
+.saiba-mais {
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: max-height 0.3s ease;
+    max-height: 50px; /* Exibe apenas o cabeçalho inicialmente */
+}
+
+.saiba-mais.expanded {
+    max-height: 300px; /* Ajuste conforme necessário para conter o conteúdo */
+}
+
+.saiba-mais-header {
+    background-color: var(--intermediaria);
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saiba-mais-content {
+    padding: 10px 20px;
+    display: none;
+}
+
+.saiba-mais.expanded .saiba-mais-content {
+    display: block;
+}
+
+.saiba-mais .toggle-indicator {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.saiba-mais.expanded .toggle-indicator {
+    transform: rotate(45deg);
+}
+
+/* Estilos para o Saiba Mais aprimorado */
+#saiba-mais {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--card-bg);
+    border: 1px solid var(--input-border);
+}
+
+.saiba-mais-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--texto-escuro);
+}
+
+.info-icon {
+    color: var(--destaque-1);
+    font-size: 1.2em;
+}
+
+.expand-icon {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+#saiba-mais.expanded .expand-icon {
+    transform: rotate(180deg);
+}
+
+.saiba-mais-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 15px;
+}
+
+#saiba-mais.expanded .saiba-mais-content {
+    max-height: 500px;
+    padding: 15px;
+    border-top: 1px solid var(--input-border);
+}
+
 @keyframes idleBreathing {
     0% {
         transform: translate(-50%, -50%) scale(1);
@@ -576,68 +665,4 @@ button {
     opacity: 0.8;
     margin-top: 5px;
     color: var(--texto-escuro);
-}
-
-.phase-markers {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    width: 100%;
-    top: 100%;
-    margin-top: 5px;
-    gap: 10px;
-}
-
-.phase-marker {
-    flex: 1;
-    height: 4px;
-    background: var(--input-bg);
-    border-radius: 2px;
-    position: relative;
-    overflow: hidden;
-    transition: background-color 0.3s ease;
-}
-
-.marker-fill {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 0%;
-    background: var(--destaque-1);
-    border-radius: 2px;
-    transition: width 0.1s linear, background-color 0.3s ease;
-}
-
-.marker-label {
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    color: var(--texto-escuro);
-    opacity: 0.7;
-    white-space: nowrap;
-}
-
-.phase-marker.active {
-    background: var(--intermediaria);
-}
-
-.phase-marker.active .marker-fill {
-    background: var(--destaque-1);
-}
-
-/* Cores específicas para cada fase */
-.phase-marker[data-phase="inhale"].active .marker-fill {
-    background: #174073; /* Azul para inspiração */
-}
-
-.phase-marker[data-phase="hold-in"].active .marker-fill,
-.phase-marker[data-phase="hold-out"].active .marker-fill {
-    background: #989FB1; /* Cinza azulado para retenção */
-}
-
-.phase-marker[data-phase="exhale"].active .marker-fill {
-    background: #CDA561; /* Dourado para expiração */
 }

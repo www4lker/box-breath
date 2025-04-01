@@ -390,7 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
         }
         toggleAdvancedControlsVisibility(technique); // Ajusta controles avançados
-        resetPhaseMarkers();
     }
     
     /** Inicia a contagem regressiva e, em seguida, o exercício */
@@ -554,15 +553,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateProgressIndicatorPosition(phaseProgressBox); break;
         }
     
-        // Após atualizar o progressBar
-        if (progressBar) {
-            progressBar.style.width = `${progressPercent}%`;
-            progressBar.textContent = `${Math.round(progressPercent)}%`;
-        }
-        
-        // Adicione esta linha
-        updatePhaseMarkers(timestamp);
-    
         animationFrameId = requestAnimationFrame(animationLoop); // Continua o loop
     } // Fim animationLoop
     
@@ -714,6 +704,10 @@ function updateSaibaMais() {
     if (!saibaMaisEl || !techniqueSelect) return;
     
     const currentTechnique = techniqueSelect.value;
+    let techniqueTitle = "";
+    let detailedInfo = "";
+    
+    // Define título amigável para cada técnica
     const techniqueTitles = {
         'box': 'Box Breathing (Respiração da Caixa)',
         'alternate': 'Alternate Nostril (Respiração Alternada)',
@@ -721,121 +715,87 @@ function updateSaibaMais() {
         '478': 'Respiração 4-7-8'
     };
     
-    const techniqueTitle = techniqueTitles[currentTechnique] || 'Técnica de Respiração';
+    techniqueTitle = techniqueTitles[currentTechnique] || 'Técnica de Respiração';
     
-    // Atualiza o conteúdo sem lógica de expansão
+    // Primeiro, mostra apenas o título convidativo
     saibaMaisEl.innerHTML = `
         <div class="saiba-mais-header">
             <span class="info-icon">ⓘ</span>
-            <span>Saiba mais sobre ${techniqueTitle}</span>
-        </div>
-        <div class="saiba-mais-content">
-            ${getTechniqueContent(currentTechnique)}
+            Saiba mais sobre ${techniqueTitle}
+            <span class="expand-icon">▼</span>
         </div>
     `;
-}
 
-// Remova event listener de clique do saibaMais
-const saibaMais = document.getElementById('saiba-mais');
-if (saibaMais) {
-    // Remova o evento de clique existente
-    saibaMais.onclick = null;
-}
-
-function updatePhaseMarkers(timestamp) {
-    const markers = document.querySelectorAll('.phase-marker');
-    if (!markers.length) return;
-
-    const timeIntoPhaseSeconds = (timestamp - phaseStartTime) / 1000;
-    const phaseProgress = Math.min(1, timeIntoPhaseSeconds / currentPhaseDuration);
-    
-    markers.forEach((marker, index) => {
-        // Remove active de todos primeiro
-        marker.classList.remove('active');
-        const fill = marker.querySelector('.marker-fill');
-        if (fill) {
-            fill.style.width = '0%';
-        }
-    });
-
-    // Ativa o marcador da fase atual
-    const currentMarker = markers[currentPhase];
-    if (currentMarker) {
-        currentMarker.classList.add('active');
-        const fill = currentMarker.querySelector('.marker-fill');
-        if (fill) {
-            fill.style.width = `${phaseProgress * 100}%`;
-        }
-    }
-}
-
-function resetPhaseMarkers() {
-    const markers = document.querySelectorAll('.phase-marker');
-    markers.forEach(marker => {
-        marker.classList.remove('active');
-        const fill = marker.querySelector('.marker-fill');
-        if (fill) {
-            fill.style.width = '0%';
-        }
-    });
-}
-
-/** Define o conteúdo específico para cada técnica */
-function getTechniqueContent(technique) {
-    switch(technique) {
+    // Prepara o conteúdo detalhado que será mostrado ao expandir
+    switch(currentTechnique) {
         case 'box':
-            return `
-                <p><strong>Para que serve:</strong> Ajuda a acalmar a mente e melhorar a concentração através de um ritmo respiratório estruturado e equilibrado. Ideal para momentos de estresse ou quando precisar de foco.</p>
-                <p><strong>Como fazer:</strong></p>
-                <ol>
-                    <li>Sente-se confortavelmente.</li>
-                    <li>Inspire lentamente pelo nariz contando até 4.</li>
-                    <li>Segure o ar nos pulmões contando até 4.</li>
-                    <li>Expire lentamente pelo nariz contando até 4.</li>
-                    <li>Mantenha os pulmões vazios contando até 4.</li>
-                    <li>Repita o ciclo acompanhando a animação.</li>
-                </ol>
-            `;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Ajuda a acalmar a mente e melhorar a concentração através de um ritmo respiratório estruturado e equilibrado.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Inspire lentamente pelo nariz (4s)</li>
+                        <li>Segure o ar nos pulmões (4s)</li>
+                        <li>Expire lentamente pelo nariz (4s)</li>
+                        <li>Mantenha os pulmões vazios (4s)</li>
+                    </ol>
+                </div>`;
+            break;
         case 'alternate':
-            return `
-                <p><strong>Para que serve:</strong> Promove clareza mental, equilíbrio e foco, direcionando o fluxo de ar alternadamente entre as narinas. Ajuda a equilibrar os hemisférios cerebrais.</p>
-                <p><strong>Como fazer:</strong></p>
-                <ol>
-                    <li>Sente-se confortavelmente com a coluna ereta.</li>
-                    <li>Use o polegar direito para fechar suavemente a narina direita. Inspire pela esquerda.</li>
-                    <li>Feche a narina esquerda com o dedo anelar direito, solte o polegar da direita. Expire pela direita.</li>
-                    <li>Inspire pela narina direita.</li>
-                    <li>Feche a narina direita com o polegar, solte o anelar da esquerda. Expire pela esquerda.</li>
-                    <li>Isso completa um ciclo. Continue alternando conforme a animação.</li>
-                </ol>
-            `;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Promove clareza mental, equilíbrio e foco, direcionando o fluxo de ar alternadamente entre as narinas.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Feche a narina direita e inspire pela esquerda.</li>
+                        <li>Feche a narina esquerda e expire pela direita.</li>
+                        <li>Inspire pela narina direita.</li>
+                        <li>Feche a narina direita e expire pela esquerda.</li>
+                    </ol>
+                </div>`;
+            break;
         case 'diaphragmatic':
-            return `
-                <p><strong>Para que serve:</strong> Induz ao relaxamento profundo e reduz o estresse ao utilizar o músculo diafragma para uma respiração mais eficiente e calmante. Base para muitas técnicas de relaxamento.</p>
-                <p><strong>Como fazer:</strong></p>
-                <ol>
-                    <li>Sente-se ou deite-se confortavelmente.</li>
-                    <li>Coloque uma mão sobre a barriga (logo abaixo das costelas).</li>
-                    <li>Inspire lentamente pelo nariz, sentindo a barriga subir suavemente (o peito move-se pouco).</li>
-                    <li>Expire lentamente pela boca ou nariz, sentindo a barriga descer.</li>
-                    <li>Mantenha a respiração suave e focada no movimento abdominal, seguindo a animação.</li>
-                </ol>
-            `;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Induz ao relaxamento profundo e reduz o estresse ao utilizar o músculo diafragma para uma respiração mais eficiente.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Coloque uma mão sobre a barriga.</li>
+                        <li>Inspire lentamente pelo nariz, sentindo a barriga subir.</li>
+                        <li>Expire lentamente pela boca, sentindo a barriga descer.</li>
+                    </ol>
+                </div>`;
+            break;
         case '478':
-            return `
-                <p><strong>Para que serve:</strong> Técnica eficaz para acalmar rapidamente o sistema nervoso, reduzir a ansiedade e auxiliar na indução do sono através de tempos específicos de inspiração, retenção e expiração.</p>
-                <p><strong>Como fazer:</strong></p>
-                <ol>
-                    <li>Sente-se ou deite-se confortavelmente.</li>
-                    <li>Expire todo o ar pela boca, fazendo um som suave de "sopro".</li>
-                    <li>Feche a boca, inspire silenciosamente pelo nariz contando até 4.</li>
-                    <li>Segure a respiração contando até 7.</li>
-                    <li>Expire completamente pela boca, com som de "sopro", contando até 8.</li>
-                    <li>Isso completa um ciclo. Repita seguindo a animação (geralmente 3-4 ciclos são recomendados).</li>
-                </ol>
-            `;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Técnica eficaz para acalmar rapidamente o sistema nervoso e auxiliar na indução do sono.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Expire completamente pela boca.</li>
+                        <li>Inspire pelo nariz contando até 4.</li>
+                        <li>Segure a respiração contando até 7.</li>
+                        <li>Expire pela boca contando até 8.</li>
+                    </ol>
+                </div>`;
+            break;
         default:
-            return '<p>Selecione uma técnica para ver mais informações.</p>';
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p>Selecione uma técnica para ver mais informações.</p>
+                </div>`;
     }
+
+    // Adiciona o conteúdo detalhado (inicialmente oculto)
+    saibaMaisEl.innerHTML += detailedInfo;
+
+    // Atualiza os estilos
+    saibaMaisEl.classList.remove('expanded');
+    saibaMaisEl.style.cursor = 'pointer';
+
+    // Adiciona evento para expandir/recolher
+    saibaMaisEl.onclick = () => {
+        saibaMaisEl.classList.toggle('expanded');
+    };
 }
 
