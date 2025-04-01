@@ -78,37 +78,70 @@ document.addEventListener('DOMContentLoaded', () => {
     /** Inicializa o AudioContext e cria os nós de áudio reutilizáveis */
     function initAudio() {
         try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) { console.warn("Web Audio API não suportada."); return; }
-            if (!audioCtx) {
-                audioCtx = new AudioContext();
-                const createSoundNode = (type, baseFreq, targetFreq = null) => { const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.type = type; oscillator.frequency.value = baseFreq; gainNode.gain.value = 0; oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.start(); return { oscillator, gainNode, baseFreq, targetFreq }; };
-                sounds.inhale = createSoundNode('sine', 220, 440); sounds.exhale = createSoundNode('sine', 440, 220); sounds.hold = createSoundNode('sine', 330); sounds.vertex = createSoundNode('square', 660);
-                console.log("AudioContext inicializado.");
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) {
+                console.warn("Web Audio API não suportada.");
+                return;
             }
-        } catch (e) { console.error("Erro ao inicializar Web Audio API:", e); audioCtx = null; }
-     }
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+
+                // Filtro passa-baixo para suavizar os agudos
+                const lowPass = audioCtx.createBiquadFilter();
+                lowPass.type = "lowpass";
+                lowPass.frequency.value = 500; // Corta acima de 500Hz
+                lowPass.Q.value = 1;
+                lowPass.connect(audioCtx.destination);
+
+                // Função auxiliar para criar os sons com configurações padronizadas
+                const createSound = (waveType, baseFreq, targetFreq = baseFreq) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = waveType;
+                    osc.frequency.value = baseFreq;
+                    gain.gain.value = 0; // Inicia com volume zero
+                    osc.connect(gain);
+                    gain.connect(lowPass);
+                    osc.start();
+                    return { oscillator: osc, gainNode: gain, baseFreq, targetFreq };
+                };
+
+                sounds.inhale = createSound('sine', 174.61, 196.00);  // Fá3 -> Sol3
+                sounds.exhale = createSound('sine', 196.00, 174.61);  // Sol3 -> Fá3
+                sounds.hold   = createSound('sine', 130.81);           // Dó3
+                sounds.vertex = createSound('triangle', 261.63);       // Dó4
+
+                console.log("AudioContext inicializado com som aprimorado.");
+            }
+        } catch (e) {
+            console.error("Erro ao inicializar o AudioContext:", e);
+        }
+    }
+
     /** Toca um som específico com rampas de frequência e ganho */
     function playSound(soundData, durationSeconds) {
         if (isMuted) return;
         if (!audioCtx || !soundData || !soundData.gainNode) return;
-        const { oscillator, gainNode, baseFreq, targetFreq } = soundData;
         const now = audioCtx.currentTime;
+        const maxGain = 0.08; // Volume reduzido para um som mais suave
+        const { oscillator, gainNode, baseFreq, targetFreq } = soundData;
+
         oscillator.frequency.cancelScheduledValues(now);
         oscillator.frequency.setValueAtTime(baseFreq, now);
-        if (targetFreq !== null && durationSeconds > 0.05) {
+        if (targetFreq && durationSeconds > 0.05) {
             oscillator.frequency.linearRampToValueAtTime(targetFreq, now + durationSeconds);
         }
         gainNode.gain.cancelScheduledValues(now);
         gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.15 * SOUND_VOLUME_MULTIPLIER, now + 0.05);
+        gainNode.gain.linearRampToValueAtTime(maxGain, now + 0.05);
         if (durationSeconds > 0.15) {
-            gainNode.gain.setValueAtTime(0.15 * SOUND_VOLUME_MULTIPLIER, now + durationSeconds - 0.1);
+            gainNode.gain.setValueAtTime(maxGain, now + durationSeconds - 0.1);
             gainNode.gain.linearRampToValueAtTime(0, now + durationSeconds);
         } else {
             gainNode.gain.linearRampToValueAtTime(0, now + durationSeconds);
         }
     }
+
     /** Toca um som curto e pontual (beep de transição) */
     function playVertexSound() {
         if (isMuted) return;
