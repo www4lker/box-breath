@@ -667,6 +667,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (muteBtn) muteBtn.addEventListener('click', toggleMute);
     updateMuteButton();
     
+    const saibaMais = document.getElementById('saiba-mais');
+    if (saibaMais) {
+        saibaMais.addEventListener('click', () => {
+            saibaMais.classList.toggle('expanded');
+        });
+    }
+
     // --- Inicialização ---
     const initialTheme = getInitialTheme(); applyTheme(initialTheme);
     selectedTechnique = techniqueSelect ? techniqueSelect.value : 'box';
@@ -688,20 +695,63 @@ function updateSaibaMais() {
     let info = "";
     switch(selectedTechnique) {
         case 'box':
-            info = "Box Breathing: Uma técnica com 4 fases que ajuda a reduzir o estresse e melhorar o foco. Inspirar, segurar, expirar e segurar - cada fase com a mesma duração.";
+            info = `
+<h3>Box Breathing (Respiração da Caixa)</h3>
+<p><strong>Para que serve:</strong> Ajuda a acalmar a mente e melhorar a concentração através de um ritmo respiratório estruturado e equilibrado. Ideal para momentos de estresse ou quando precisar de foco.</p>
+<p><strong>Como fazer:</strong></p>
+<ol>
+  <li>Sente-se confortavelmente.</li>
+  <li>Inspire lentamente pelo nariz contando até 4.</li>
+  <li>Segure o ar nos pulmões contando até 4.</li>
+  <li>Expire lentamente pelo nariz contando até 4.</li>
+  <li>Mantenha os pulmões vazios contando até 4.</li>
+</ol>
+<p>Repita o ciclo acompanhando a animação.</p>`;
             break;
         case 'alternate':
-            info = "Alternate Nostril (Nadi Shodhana): Alterna a respiração entre as narinas para equilibrar o sistema nervoso. Ajuda na concentração e reduz a ansiedade.";
+            info = `
+<h3>Alternate Nostril Breathing (Respiração Alternada)</h3>
+<p><strong>Para que serve:</strong> Promove clareza mental, equilíbrio e foco, direcionando o fluxo de ar alternadamente entre as narinas. Ajuda a equilibrar os hemisférios cerebrais.</p>
+<p><strong>Como fazer:</strong></p>
+<ol>
+  <li>Sente-se confortavelmente com a coluna ereta.</li>
+  <li>Use o polegar direito para fechar suavemente a narina direita e inspire pela esquerda.</li>
+  <li>Feche a narina esquerda com o dedo anelar direito, solte o polegar da direita e expire pela direita.</li>
+  <li>Inspire pela narina direita.</li>
+  <li>Feche a narina direita com o polegar, solte o anelar da esquerda e expire pela esquerda.</li>
+</ol>
+<p>Isso completa um ciclo. Continue alternando conforme a animação.</p>`;
             break;
         case 'diaphragmatic':
-            info = "Diaphragmatic Breathing: Respiração profunda usando o diafragma. Reduz o estresse, melhora a função pulmonar e promove relaxamento profundo.";
+            info = `
+<h3>Diaphragmatic Breathing (Respiração Diafragmática)</h3>
+<p><strong>Para que serve:</strong> Induz ao relaxamento profundo e reduz o estresse ao utilizar o músculo diafragma para uma respiração mais eficiente e calmante. Base para muitas técnicas de relaxamento.</p>
+<p><strong>Como fazer:</strong></p>
+<ol>
+  <li>Sente-se ou deite-se confortavelmente.</li>
+  <li>Coloque uma mão sobre a barriga (logo abaixo das costelas).</li>
+  <li>Inspire lentamente pelo nariz, sentindo a barriga subir suavemente (o peito move-se pouco).</li>
+  <li>Expire lentamente pela boca ou nariz, sentindo a barriga descer.</li>
+  <li>Mantenha a respiração suave e focada no movimento abdominal, seguindo a animação.</li>
+</ol>`;
             break;
         case '478':
-            info = "4-7-8 Breathing: Desenvolvida pelo Dr. Andrew Weil, esta técnica induz relaxamento profundo. Inspire por 4s, segure por 7s e expire por 8s.";
+            info = `
+<h3>4-7-8 Breathing (Respiração 4-7-8)</h3>
+<p><strong>Para que serve:</strong> Técnica eficaz para acalmar rapidamente o sistema nervoso, reduzir a ansiedade e auxiliar na indução do sono através de tempos específicos de inspiração, retenção e expiração.</p>
+<p><strong>Como fazer:</strong></p>
+<ol>
+  <li>Sente-se ou deite-se confortavelmente.</li>
+  <li>Expire todo o ar pela boca, fazendo um som suave de "sopro".</li>
+  <li>Feche a boca e inspire silenciosamente pelo nariz contando até 4.</li>
+  <li>Segure a respiração contando até 7.</li>
+  <li>Expire completamente pela boca, com som de "sopro", contando até 8.</li>
+</ol>
+<p>Isso completa um ciclo. Repita (geralmente 3-4 ciclos) seguindo a animação.</p>`;
             break;
         default:
-            info = "Selecione uma técnica para ver mais informações.";
+            info = "<p>Selecione uma técnica para ver mais informações.</p>";
     }
-    saibaMaisEl.innerHTML = `<p>${info}</p>`;
+    saibaMaisEl.innerHTML = info;
 }
 

@@ -515,3 +515,44 @@ button {
     transition: transform 0.3s ease, background-color 1s ease, border-color 1s ease;
     background-color: transparent;
 }
+
+.saiba-mais {
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: max-height 0.3s ease;
+    max-height: 50px; /* Exibe apenas o cabeçalho inicialmente */
+}
+
+.saiba-mais.expanded {
+    max-height: 300px; /* Ajuste conforme necessário para conter o conteúdo */
+}
+
+.saiba-mais-header {
+    background-color: var(--intermediaria);
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saiba-mais-content {
+    padding: 10px 20px;
+    display: none;
+}
+
+.saiba-mais.expanded .saiba-mais-content {
+    display: block;
+}
+
+.saiba-mais .toggle-indicator {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.saiba-mais.expanded .toggle-indicator {
+    transform: rotate(45deg);
+}
