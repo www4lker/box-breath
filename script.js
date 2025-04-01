@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Referências globais para elementos Alternate Nostril
     let leftNostrilElement = null;
     let rightNostrilElement = null;
+    let rightHandImage = null;  // Imagem para quando respirar pela narina direita
+    let leftHandImage = null;   // Imagem para quando respirar pela narina esquerda
     
     // --- Variáveis de Estado ---
     let isBreathing = false; let currentPhase = 0; let totalDurationSeconds = 0; let elapsedTimeSeconds = 0;
@@ -216,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rightHandImage.className = 'hand-image';
         rightHandImage.setAttribute('style', `
             position: absolute; left: 10%; top: 50%;
-            transform: translateY(-50%); max-height: 52%; max-width: 21%;
+            transform: translateY(-50%); max-height: 50%; max-width: 21%;
             opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 5;`);
     
         leftHandImage = document.createElement('img');
@@ -225,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         leftHandImage.className = 'hand-image';
         leftHandImage.setAttribute('style', `
             position: absolute; right: 10%; top: 50%;
-            transform: translateY(-50%); max-height: 52%; max-width: 21%;
+            transform: translateY(-50%); max-height: 50%; max-width: 21%;
             opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 5;`);
     
         // Adicionar elementos ao container
@@ -516,9 +518,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Fases de exalação - fade out gradual
                 if ([2].includes(currentPhase)) { // Exalação após direita
-                    rightHandImage.style.opacity = String(1 - progress);
+                    rightHandImage.style.opacity = String(0 - progress);
                 } else if ([6].includes(currentPhase)) { // Exalação após esquerda
-                    leftHandImage.style.opacity = String(1 - progress);
+                    leftHandImage.style.opacity = String(0 - progress);
                 }
             }
         }
