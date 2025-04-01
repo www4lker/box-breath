@@ -555,7 +555,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if(startBtn) startBtn.addEventListener('click', startExercise); else console.error("Botão Iniciar não encontrado!");
     if(stopBtn) stopBtn.addEventListener('click', () => stopExercise(true));
     if(themeToggleBtn) themeToggleBtn.addEventListener('click', () => { const current = htmlElement.dataset.theme || 'light'; const nextTheme = current === 'light' ? 'dark' : 'light'; applyTheme(nextTheme); applyCategoryPalette(currentCategory); });
-    if(techniqueSelect) techniqueSelect.addEventListener('change', (event) => { selectedTechnique = event.target.value; const newCategory = techniqueCategories[selectedTechnique] || 'focus'; removeAlternateNostrilElements(); applyCategoryPalette(newCategory); configureInitialStateForTechnique(selectedTechnique); if (currentUIState === UI_STATE.IDLE && durationSelect && timerDisplay){ timerDisplay.textContent = formatTime(parseInt(durationSelect.value, 10)); } console.log(`Técnica alterada para: ${selectedTechnique}`); });
+    if(techniqueSelect) techniqueSelect.addEventListener('change', (event) => { 
+        selectedTechnique = event.target.value; 
+        const newCategory = techniqueCategories[selectedTechnique] || 'focus'; 
+        removeAlternateNostrilElements(); 
+        applyCategoryPalette(newCategory); 
+        configureInitialStateForTechnique(selectedTechnique);
+        updateSaibaMais(); // Adiciona chamada para atualizar Saiba Mais
+        if (currentUIState === UI_STATE.IDLE && durationSelect && timerDisplay){
+            timerDisplay.textContent = formatTime(parseInt(durationSelect.value, 10)); 
+        }
+        console.log(`Técnica alterada para: ${selectedTechnique}`);
+    });
     if(durationSelect) durationSelect.addEventListener('change', (event) => { if (currentUIState === UI_STATE.IDLE && timerDisplay){ timerDisplay.textContent = formatTime(parseInt(event.target.value, 10)); } });
     if(toggleAdvancedBtn && advancedControls) toggleAdvancedBtn.addEventListener('click', () => { const isHidden = advancedControls.style.display === 'none' || advancedControls.style.display === ''; advancedControls.style.display = isHidden ? 'block' : 'none'; toggleAdvancedBtn.textContent = isHidden ? 'Esconder Controles Avançados' : 'Mostrar Controles Avançados'; if(isHidden){ toggleAdvancedControlsVisibility(selectedTechnique); } });
     if(phaseDurationInput && phaseDurationValue) phaseDurationInput.addEventListener('input', () => { if(phaseDurationValue) phaseDurationValue.textContent = phaseDurationInput.value; });
@@ -568,7 +579,33 @@ document.addEventListener('DOMContentLoaded', () => {
     configureInitialStateForTechnique(selectedTechnique); // Configura visual inicial
     setUIState(UI_STATE.IDLE); // Define estado inicial
     if(phaseDurationInput && phaseDurationValue) { phaseDurationValue.textContent = phaseDurationInput.value; }
+    updateSaibaMais(); // Adiciona chamada inicial
     window.addEventListener('resize', updateBoxDimensions);
     console.log("App de Respiração inicializado (v8.1 FINAL).");
     }); // Fim do DOMContentLoaded
+
+/** Atualiza o conteúdo da caixa Saiba Mais baseado na técnica selecionada */
+function updateSaibaMais() {
+    const saibaMaisEl = document.getElementById('saiba-mais');
+    if (!saibaMaisEl) return;
+    
+    let info = "";
+    switch(selectedTechnique) {
+        case 'box':
+            info = "Box Breathing: Uma técnica com 4 fases que ajuda a reduzir o estresse e melhorar o foco. Inspirar, segurar, expirar e segurar - cada fase com a mesma duração.";
+            break;
+        case 'alternate':
+            info = "Alternate Nostril (Nadi Shodhana): Alterna a respiração entre as narinas para equilibrar o sistema nervoso. Ajuda na concentração e reduz a ansiedade.";
+            break;
+        case 'diaphragmatic':
+            info = "Diaphragmatic Breathing: Respiração profunda usando o diafragma. Reduz o estresse, melhora a função pulmonar e promove relaxamento profundo.";
+            break;
+        case '478':
+            info = "4-7-8 Breathing: Desenvolvida pelo Dr. Andrew Weil, esta técnica induz relaxamento profundo. Inspire por 4s, segure por 7s e expire por 8s.";
+            break;
+        default:
+            info = "Selecione uma técnica para ver mais informações.";
+    }
+    saibaMaisEl.innerHTML = `<p>${info}</p>`;
+}
 

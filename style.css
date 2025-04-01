@@ -464,7 +464,31 @@ button {
     display: none; /* Começa escondido */
 }
 
-/* ...existing code... */
+/* Oculta controles avançados */
+#advanced-controls,
+#toggle-advanced {
+    display: none !important;
+}
+
+/* Estilo para caixa Saiba Mais */
+.saiba-mais {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background-color: var(--intermediaria);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 0.95em;
+    text-align: left;
+    line-height: 1.4;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--texto);
+}
+
+.saiba-mais p {
+    margin: 0;
+}
 
 #progress-indicator {
     pointer-events: none;

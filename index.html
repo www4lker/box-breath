@@ -14,7 +14,7 @@
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema">
                     <!-- Ícone Sol (Tema Claro) -->
                     <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm4.5 5.5a1 1 0 0 1 0 1.42l-.71.71a1 1 0 0 1-1.42-1.42l.71-.71a1 1 0 0 1 1.42 0zm-9 0a1 1 0 0 1 1.42 0l.71.71a1 1 0 0 1-1.42 1.42l-.71-.71a1 1 0 0 1 0-1.42zM12 20a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm-4.5-5.5a1 1 0 0 1 0-1.42l.71-.71a1 1 0 0 1 1.42 1.42l-.71.71a1 1 0 0 1-1.42 0zm9 0a1 1 0 0 1-1.42 0l-.71-.71a1 1 0 0 1 1.42-1.42l.71.71a1 1 0 0 1 0 1.42zM4 12a1 1 0 0 1-1-1 1 1 0 0 1 1-1h1a1 1 0 0 1 0 2H4zm17-1a1 1 0 0 1-1 1h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1zM12 6.5a5.5 5.5 0 1 0 5.5 5.5 5.51 5.51 0 0 0-5.5-5.5z"/>
+                        <path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm4.5 5.5a1 1 0 0 1 0 1.42l-.71.71a1 1 0 0 1-1.42-1.42l.71-.71a1 1 0 0 1 1.42 0zm-9 0a1 1 0 0 1 1.42 0l.71.71a1 1 0 0 1-1.42 1.42l-.71-.71a1 1 0 0 1 0-1.42zM12 20a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm-4.5-5.5a1 1 0 0 1 0-1.42l.71-.71a1 1 0 0 1 1.42 1.42l-.71-.71a1 1 0 0 1-1.42 0zm9 0a1 1 0 0 1-1.42 0l-.71-.71a1 1 0 0 1 1.42-1.42l.71.71a1 1 0 0 1 0 1.42zM4 12a1 1 0 0 1-1-1 1 1 0 0 1 1-1h1a1 1 0 0 1 0 2H4zm17-1a1 1 0 0 1-1 1h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1zM12 6.5a5.5 5.5 0 1 0 5.5 5.5 5.51 5.51 0 0 0-5.5-5.5z"/>
                     </svg>
                     <!-- Ícone Lua (Tema Escuro) -->
                     <svg class="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -28,13 +28,10 @@
                 <!-- Seleção de Técnica -->
                 <div class="config-item">
                     <label for="technique-select">Técnica:</label>
-                    <select id="technique-select">
+                    <select id="technique-select" class="control">
                         <option value="box" selected>Box Breathing</option>
                         <option value="alternate">Alternate Nostril Breathing</option>
-                        <option value="bhastrika">Bhastrika Pranayama</option>
-                        <option value="kapal">Kapal Bhati Pranayama</option>
                         <option value="diaphragmatic">Diaphragmatic Breathing</option>
-                        <option value="bhramari">Humming Bee Breath (Bhramari)</option>
                         <option value="478">4-7-8 Breathing</option>
                     </select>
                 </div>
@@ -90,6 +87,11 @@
             <!-- Botão de Parar (aparece durante o exercício) -->
             <div class="stop-button-container">
                 <button id="stop-btn" class="hidden">Parar</button>
+            </div>
+
+            <!-- Adicionar após a div stop-button-container -->
+            <div id="saiba-mais" class="saiba-mais">
+                <p>Selecione uma técnica para ver mais informações.</p>
             </div>
 
             <!-- Controles avançados (específicos por técnica, talvez?) -->
