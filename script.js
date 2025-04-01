@@ -40,8 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Referências globais para elementos Alternate Nostril
     let leftNostrilElement = null;
     let rightNostrilElement = null;
-    let rightHandImage = null;  // Imagem para quando respirar pela narina direita
-    let leftHandImage = null;   // Imagem para quando respirar pela narina esquerda
     
     // --- Variáveis de Estado ---
     let isBreathing = false; let currentPhase = 0; let totalDurationSeconds = 0; let elapsedTimeSeconds = 0;
