@@ -73,8 +73,25 @@
                     
                 <!-- Barra de progresso total -->
                         <div class="progress-container">
-                            <!-- ... (barra de progresso como antes) ... -->
                             <div class="progress-bar" id="progress-bar">0%</div>
+                            <div class="phase-markers">
+                                <div class="phase-marker" data-phase="inhale">
+                                    <div class="marker-fill"></div>
+                                    <span class="marker-label">Inspira</span>
+                                </div>
+                                <div class="phase-marker" data-phase="hold-in">
+                                    <div class="marker-fill"></div>
+                                    <span class="marker-label">Segura</span>
+                                </div>
+                                <div class="phase-marker" data-phase="exhale">
+                                    <div class="marker-fill"></div>
+                                    <span class="marker-label">Expira</span>
+                                </div>
+                                <div class="phase-marker" data-phase="hold-out">
+                                    <div class="marker-fill"></div>
+                                    <span class="marker-label">Segura</span>
+                                </div>
+                            </div>
                             <div class="progress-marker" style="left:20%"></div>
                             <div class="progress-marker" style="left:40%"></div>
                             <div class="progress-marker" style="left:60%"></div>
@@ -90,18 +107,18 @@
                 <button id="stop-btn" class="hidden">Parar</button>
             </div>
 
-            <!-- Adicionar após a div stop-button-container -->
-            <div id="saiba-mais" class="saiba-mais collapsed">
+            <!-- Seção Saiba Mais simplificada -->
+            <div id="saiba-mais" class="saiba-mais">
                 <div class="saiba-mais-header">
-                    <span>Saiba Mais</span>
-                    <span class="toggle-indicator">+</span>
+                    <span class="info-icon">ⓘ</span>
+                    <span>Saiba mais sobre a técnica</span>
                 </div>
                 <div class="saiba-mais-content">
                     <p>Selecione uma técnica para ver mais informações.</p>
                 </div>
             </div>
 
-            <!-- Controles avançados (específicos por técnica, talvez?) -->
+            <!-- Controles avançados -->
             <button class="toggle-advanced" id="toggle-advanced">Mostrar Controles Avançados</button>
 
             <div class="advanced-controls" id="advanced-controls" style="display: none;"> <!-- Começa escondido -->
