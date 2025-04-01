@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Referências globais para elementos Alternate Nostril
     let leftNostrilElement = null;
     let rightNostrilElement = null;
+    let rightHandImage = null;  // Imagem para quando respirar pela narina direita
+    let leftHandImage = null;   // Imagem para quando respirar pela narina esquerda
     
     // --- Variáveis de Estado ---
     let isBreathing = false; let currentPhase = 0; let totalDurationSeconds = 0; let elapsedTimeSeconds = 0;
@@ -209,21 +211,47 @@ document.addEventListener('DOMContentLoaded', () => {
             opacity: 1;`);
         boxContainer.appendChild(rightNostrilElement);
     
+        // Criar imagens "hang loose"
+        rightHandImage = document.createElement('img');
+        rightHandImage.src = 'images/hangloose-up1.png';
+        rightHandImage.id = 'rightHandImage';
+        rightHandImage.className = 'hand-image';
+        rightHandImage.setAttribute('style', `
+            position: absolute; left: 10%; top: 50%;
+            transform: translateY(-50%); max-height: 52%; max-width: 21%;
+            opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 5;`);
+    
+        leftHandImage = document.createElement('img');
+        leftHandImage.src = 'images/hangloose-up2.png';
+        leftHandImage.id = 'leftHandImage';
+        leftHandImage.className = 'hand-image';
+        leftHandImage.setAttribute('style', `
+            position: absolute; right: 10%; top: 50%;
+            transform: translateY(-50%); max-height: 52%; max-width: 21%;
+            opacity: 0; transition: opacity 0.5s ease-in-out; z-index: 5;`);
+    
+        // Adicionar elementos ao container
+        boxContainer.appendChild(leftNostrilElement);
+        boxContainer.appendChild(rightNostrilElement);
+        boxContainer.appendChild(rightHandImage);
+        boxContainer.appendChild(leftHandImage);
+    
         if (breathingBox) breathingBox.style.display = 'none';
         console.log("Elementos Alternate Nostril criados."); // Log
     }
     /** Remove os elementos visuais da animação Alternate Nostril */
     function removeAlternateNostrilElements() {
         let removed = false;
-        if (leftNostrilElement && leftNostrilElement.parentNode) {
-            leftNostrilElement.parentNode.removeChild(leftNostrilElement);
-            removed = true;
-        }
-        if (rightNostrilElement && rightNostrilElement.parentNode) {
-            rightNostrilElement.parentNode.removeChild(rightNostrilElement);
-            removed = true;
-        }
-        leftNostrilElement = null; rightNostrilElement = null;
+        [leftNostrilElement, rightNostrilElement, rightHandImage, leftHandImage].forEach(element => {
+            if (element && element.parentNode) {
+                element.parentNode.removeChild(element);
+                removed = true;
+            }
+        });
+        leftNostrilElement = null;
+        rightNostrilElement = null;
+        rightHandImage = null;
+        leftHandImage = null;
         if (breathingBox) breathingBox.style.display = 'block'; // Mostra a caixa padrão novamente
         if (removed) console.log("Elementos Alternate Nostril removidos."); // Log
     }
@@ -472,6 +500,30 @@ document.addEventListener('DOMContentLoaded', () => {
     
         leftNostrilElement.style.transform = `translate(-50%, -50%) scale(${currentScaleLeft.toFixed(3)})`;
         rightNostrilElement.style.transform = `translate(-50%, -50%) scale(${currentScaleRight.toFixed(3)})`;
+    
+        // Controle da visibilidade das imagens "hang loose"
+        const isInhalingRight = [4].includes(currentPhase); // Fase 4 é inspiração direita
+        const isInhalingLeft = [0].includes(currentPhase);  // Fase 0 é inspiração esquerda
+        const isHolding = [1, 3, 5, 7].includes(currentPhase); // Fases de retenção
+    
+        if (rightHandImage && leftHandImage) {
+            if (isInhalingRight) {
+                rightHandImage.style.opacity = '1';
+                leftHandImage.style.opacity = '0';
+            } else if (isInhalingLeft) {
+                rightHandImage.style.opacity = '0';
+                leftHandImage.style.opacity = '1';
+            } else if (isHolding) {
+                // Mantém a opacidade atual durante retenção
+            } else {
+                // Fases de exalação - fade out gradual
+                if ([2].includes(currentPhase)) { // Exalação após direita
+                    rightHandImage.style.opacity = String(1 - progress);
+                } else if ([6].includes(currentPhase)) { // Exalação após esquerda
+                    leftHandImage.style.opacity = String(1 - progress);
+                }
+            }
+        }
     }
     
     /** Atualiza a posição do ponto no perímetro (Box) */
@@ -519,5 +571,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updateBoxDimensions);
     console.log("App de Respiração inicializado (v8.1 FINAL).");
     }); // Fim do DOMContentLoaded
-    
-    
+
