@@ -473,21 +473,54 @@ button {
 /* Estilo para caixa Saiba Mais */
 .saiba-mais {
     margin-top: 20px;
-    padding: 15px 20px;
+    width: 100%; /* Garante que ocupe toda largura disponível */
+    max-width: 100%; /* Remove limitação fixa */
+    box-sizing: border-box; /* Inclui padding no cálculo da largura */
+    padding: 15px;
     background-color: var(--intermediaria);
     border: 1px solid var(--input-border);
     border-radius: 8px;
     font-size: 0.95em;
     text-align: left;
     line-height: 1.4;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    color: var(--texto);
 }
 
-.saiba-mais p {
-    margin: 0;
+.saiba-mais-header {
+    width: 100%;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Permite quebra em telas pequenas */
+    gap: 10px;
+}
+
+.saiba-mais-content {
+    padding: 15px;
+    width: 100%;
+    overflow-x: hidden; /* Evita scroll horizontal */
+}
+
+.saiba-mais-content ol {
+    padding-left: 20px; /* Reduz padding da lista */
+    margin: 10px 0;
+}
+
+/* Media queries para telas menores */
+@media screen and (max-width: 480px) {
+    .saiba-mais {
+        margin: 15px 0;
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    .saiba-mais-header {
+        padding: 10px;
+    }
+
+    .saiba-mais-content {
+        padding: 10px;
+    }
 }
 
 #progress-indicator {
@@ -555,4 +588,81 @@ button {
 
 .saiba-mais.expanded .toggle-indicator {
     transform: rotate(45deg);
+}
+
+/* Estilos para o Saiba Mais aprimorado */
+#saiba-mais {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--card-bg);
+    border: 1px solid var(--input-border);
+}
+
+.saiba-mais-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--texto-escuro);
+}
+
+.info-icon {
+    color: var(--destaque-1);
+    font-size: 1.2em;
+}
+
+.expand-icon {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+#saiba-mais.expanded .expand-icon {
+    transform: rotate(180deg);
+}
+
+.saiba-mais-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 15px;
+}
+
+#saiba-mais.expanded .saiba-mais-content {
+    max-height: 500px;
+    padding: 15px;
+    border-top: 1px solid var(--input-border);
+}
+
+@keyframes idleBreathing {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        border-color: var(--destaque-2);
+        box-shadow: 0 0 15px rgba(184, 90, 56, 0.1); /* Ajuste para var(--destaque-2) */
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(0.95);
+        border-color: var(--destaque-1);
+        box-shadow: 0 0 25px rgba(232, 110, 75, 0.2); /* Ajuste para var(--destaque-1) */
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        border-color: var(--destaque-2);
+        box-shadow: 0 0 15px rgba(184, 90, 56, 0.1);
+    }
+}
+
+.idle-animation {
+    animation: idleBreathing 4s ease-in-out infinite;
+}
+
+.idle-timer {
+    display: block;
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-top: 5px;
+    color: var(--texto-escuro);
 }

@@ -197,11 +197,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if(countdownDisplay) countdownDisplay.classList.add('hidden');
         if (phaseCountdownDisplay) phaseCountdownDisplay.style.display = 'none'; // Esconde contador fase por padrão
     
+        // Controle da animação idle
+        if (breathingBox) {
+            breathingBox.classList.remove('idle-animation'); // Remove primeiro
+            if (newState === UI_STATE.IDLE) {
+                breathingBox.classList.add('idle-animation'); // Adiciona apenas no estado idle
+            }
+        }
+    
         switch (newState) {
             case UI_STATE.IDLE:
                 if(startBtn) startBtn.classList.remove('hidden');
-                if(instruction) instruction.textContent = "Pronto para começar?";
-                if (durationSelect && timerDisplay) timerDisplay.textContent = formatTime(parseInt(durationSelect.value, 10));
+                if (instruction) {
+                    const timeText = formatTime(parseInt(durationSelect.value, 10));
+                    instruction.innerHTML = `Pronto para começar?<br><span class="idle-timer">${timeText}</span>`;
+                }
                 if (progressBar) { progressBar.style.width = '0%'; progressBar.textContent = '0%'; }
                 toggleAdvancedControlsVisibility(selectedTechnique);
                 break;
@@ -690,68 +700,102 @@ document.addEventListener('DOMContentLoaded', () => {
 /** Atualiza o conteúdo da caixa Saiba Mais baseado na técnica selecionada */
 function updateSaibaMais() {
     const saibaMaisEl = document.getElementById('saiba-mais');
-    if (!saibaMaisEl) return;
+    const techniqueSelect = document.getElementById('technique-select');
+    if (!saibaMaisEl || !techniqueSelect) return;
     
-    let info = "";
-    switch(selectedTechnique) {
+    const currentTechnique = techniqueSelect.value;
+    let techniqueTitle = "";
+    let detailedInfo = "";
+    
+    // Define título amigável para cada técnica
+    const techniqueTitles = {
+        'box': 'Box Breathing (Respiração da Caixa)',
+        'alternate': 'Alternate Nostril (Respiração Alternada)',
+        'diaphragmatic': 'Respiração Diafragmática',
+        '478': 'Respiração 4-7-8'
+    };
+    
+    techniqueTitle = techniqueTitles[currentTechnique] || 'Técnica de Respiração';
+    
+    // Primeiro, mostra apenas o título convidativo
+    saibaMaisEl.innerHTML = `
+        <div class="saiba-mais-header">
+            <span class="info-icon">ⓘ</span>
+            Saiba mais sobre ${techniqueTitle}
+            <span class="expand-icon">▼</span>
+        </div>
+    `;
+
+    // Prepara o conteúdo detalhado que será mostrado ao expandir
+    switch(currentTechnique) {
         case 'box':
-            info = `
-<h3>Box Breathing (Respiração da Caixa)</h3>
-<p><strong>Para que serve:</strong> Ajuda a acalmar a mente e melhorar a concentração através de um ritmo respiratório estruturado e equilibrado. Ideal para momentos de estresse ou quando precisar de foco.</p>
-<p><strong>Como fazer:</strong></p>
-<ol>
-  <li>Sente-se confortavelmente.</li>
-  <li>Inspire lentamente pelo nariz contando até 4.</li>
-  <li>Segure o ar nos pulmões contando até 4.</li>
-  <li>Expire lentamente pelo nariz contando até 4.</li>
-  <li>Mantenha os pulmões vazios contando até 4.</li>
-</ol>
-<p>Repita o ciclo acompanhando a animação.</p>`;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Ajuda a acalmar a mente e melhorar a concentração através de um ritmo respiratório estruturado e equilibrado.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Inspire lentamente pelo nariz (4s)</li>
+                        <li>Segure o ar nos pulmões (4s)</li>
+                        <li>Expire lentamente pelo nariz (4s)</li>
+                        <li>Mantenha os pulmões vazios (4s)</li>
+                    </ol>
+                </div>`;
             break;
         case 'alternate':
-            info = `
-<h3>Alternate Nostril Breathing (Respiração Alternada)</h3>
-<p><strong>Para que serve:</strong> Promove clareza mental, equilíbrio e foco, direcionando o fluxo de ar alternadamente entre as narinas. Ajuda a equilibrar os hemisférios cerebrais.</p>
-<p><strong>Como fazer:</strong></p>
-<ol>
-  <li>Sente-se confortavelmente com a coluna ereta.</li>
-  <li>Use o polegar direito para fechar suavemente a narina direita e inspire pela esquerda.</li>
-  <li>Feche a narina esquerda com o dedo anelar direito, solte o polegar da direita e expire pela direita.</li>
-  <li>Inspire pela narina direita.</li>
-  <li>Feche a narina direita com o polegar, solte o anelar da esquerda e expire pela esquerda.</li>
-</ol>
-<p>Isso completa um ciclo. Continue alternando conforme a animação.</p>`;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Promove clareza mental, equilíbrio e foco, direcionando o fluxo de ar alternadamente entre as narinas.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Feche a narina direita e inspire pela esquerda.</li>
+                        <li>Feche a narina esquerda e expire pela direita.</li>
+                        <li>Inspire pela narina direita.</li>
+                        <li>Feche a narina direita e expire pela esquerda.</li>
+                    </ol>
+                </div>`;
             break;
         case 'diaphragmatic':
-            info = `
-<h3>Diaphragmatic Breathing (Respiração Diafragmática)</h3>
-<p><strong>Para que serve:</strong> Induz ao relaxamento profundo e reduz o estresse ao utilizar o músculo diafragma para uma respiração mais eficiente e calmante. Base para muitas técnicas de relaxamento.</p>
-<p><strong>Como fazer:</strong></p>
-<ol>
-  <li>Sente-se ou deite-se confortavelmente.</li>
-  <li>Coloque uma mão sobre a barriga (logo abaixo das costelas).</li>
-  <li>Inspire lentamente pelo nariz, sentindo a barriga subir suavemente (o peito move-se pouco).</li>
-  <li>Expire lentamente pela boca ou nariz, sentindo a barriga descer.</li>
-  <li>Mantenha a respiração suave e focada no movimento abdominal, seguindo a animação.</li>
-</ol>`;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Induz ao relaxamento profundo e reduz o estresse ao utilizar o músculo diafragma para uma respiração mais eficiente.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Coloque uma mão sobre a barriga.</li>
+                        <li>Inspire lentamente pelo nariz, sentindo a barriga subir.</li>
+                        <li>Expire lentamente pela boca, sentindo a barriga descer.</li>
+                    </ol>
+                </div>`;
             break;
         case '478':
-            info = `
-<h3>4-7-8 Breathing (Respiração 4-7-8)</h3>
-<p><strong>Para que serve:</strong> Técnica eficaz para acalmar rapidamente o sistema nervoso, reduzir a ansiedade e auxiliar na indução do sono através de tempos específicos de inspiração, retenção e expiração.</p>
-<p><strong>Como fazer:</strong></p>
-<ol>
-  <li>Sente-se ou deite-se confortavelmente.</li>
-  <li>Expire todo o ar pela boca, fazendo um som suave de "sopro".</li>
-  <li>Feche a boca e inspire silenciosamente pelo nariz contando até 4.</li>
-  <li>Segure a respiração contando até 7.</li>
-  <li>Expire completamente pela boca, com som de "sopro", contando até 8.</li>
-</ol>
-<p>Isso completa um ciclo. Repita (geralmente 3-4 ciclos) seguindo a animação.</p>`;
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p><strong>Para que serve:</strong> Técnica eficaz para acalmar rapidamente o sistema nervoso e auxiliar na indução do sono.</p>
+                    <p><strong>Como fazer:</strong></p>
+                    <ol>
+                        <li>Expire completamente pela boca.</li>
+                        <li>Inspire pelo nariz contando até 4.</li>
+                        <li>Segure a respiração contando até 7.</li>
+                        <li>Expire pela boca contando até 8.</li>
+                    </ol>
+                </div>`;
             break;
         default:
-            info = "<p>Selecione uma técnica para ver mais informações.</p>";
+            detailedInfo = `
+                <div class="saiba-mais-content">
+                    <p>Selecione uma técnica para ver mais informações.</p>
+                </div>`;
     }
-    saibaMaisEl.innerHTML = info;
+
+    // Adiciona o conteúdo detalhado (inicialmente oculto)
+    saibaMaisEl.innerHTML += detailedInfo;
+
+    // Atualiza os estilos
+    saibaMaisEl.classList.remove('expanded');
+    saibaMaisEl.style.cursor = 'pointer';
+
+    // Adiciona evento para expandir/recolher
+    saibaMaisEl.onclick = () => {
+        saibaMaisEl.classList.toggle('expanded');
+    };
 }
 
