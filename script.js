@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const PHASE = { INHALE: 0, HOLD_IN: 1, EXHALE: 2, HOLD_OUT: 3 }; // Box Phases
     const TOTAL_PHASES_BOX = 4;
     const UI_STATE = { IDLE: 'idle', PREPARING: 'preparing', BREATHING: 'breathing', FINISHED: 'finished' };
-    const SOUND_VOLUME_MULTIPLIER = 0.2; // Reduz 80% do volume
+    const SOUND_VOLUME_MULTIPLIER = 0.8; // Reduz 20% do volume
+    const BEEP_VOLUME_MULTIPLIER = 0.2; // 20% do volume atual para o beep
     // Categorias para paleta geral CSS
     const techniqueCategories = {
         box: 'focus', alternate: 'focus', // Alternate usa paleta 'focus' geral
@@ -117,7 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
         oscillator.frequency.setValueAtTime(baseFreq, now);
         gainNode.gain.cancelScheduledValues(now);
         gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.25 * SOUND_VOLUME_MULTIPLIER, now + 0.01);
+        // Reduzindo em 80%: aplica o fator BEEP_VOLUME_MULTIPLIER no ganho
+        gainNode.gain.linearRampToValueAtTime(0.25 * SOUND_VOLUME_MULTIPLIER * BEEP_VOLUME_MULTIPLIER, now + 0.01);
         gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
     }
     /** Para todos os sons suavemente (fade out) */
@@ -444,9 +446,32 @@ document.addEventListener('DOMContentLoaded', () => {
                  break;
             case 'box':
             default:
-                 currentPhaseDuration = getPhaseDurationSeconds(); nextPhase = (currentPhase + 1) % TOTAL_PHASES_BOX; let borderColorBox = "";
-                 switch (currentPhase) { /*...*/ }
-                 if (breathingBox) { breathingBox.style.borderColor = borderColorBox; breathingBox.style.backgroundColor = 'transparent'; }
+                currentPhaseDuration = getPhaseDurationSeconds();
+                nextPhase = (currentPhase + 1) % TOTAL_PHASES_BOX;
+                let borderColorBox = 'var(--destaque-1)'; // Cor padrão
+                
+                if (currentPhase === PHASE.INHALE) {
+                    instructionText = `Inspire (${currentPhaseDuration}s)`;
+                    soundToPlay = sounds.inhale;
+                    borderColorBox = '#174073';
+                } else if (currentPhase === PHASE.HOLD_IN) {
+                    instructionText = `Segure (${currentPhaseDuration}s)`;
+                    soundToPlay = sounds.hold;
+                    borderColorBox = '#989FB1';
+                } else if (currentPhase === PHASE.EXHALE) {
+                    instructionText = `Expire (${currentPhaseDuration}s)`;
+                    soundToPlay = sounds.exhale;
+                    borderColorBox = '#CDA561';
+                } else { // PHASE.HOLD_OUT
+                    instructionText = `Segure (${currentPhaseDuration}s)`;
+                    soundToPlay = sounds.hold;
+                    borderColorBox = '#989FB1';
+                }
+                
+                if (breathingBox) {
+                    breathingBox.style.borderColor = borderColorBox;
+                    breathingBox.style.backgroundColor = `${borderColorBox}33`;
+                }
                 break;
         }
     
