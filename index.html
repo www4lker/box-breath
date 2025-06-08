@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>App de Respiração Guiada</title> <!-- Título mais genérico -->
+        <title>Box Breathing - Respiração Quadrada</title>
         <link rel="stylesheet" href="style.css">
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -12,7 +12,7 @@
     <body>
         <div class="container">
             <div class="header">
-                <h1>Respiração Guiada Animações em Javascript</h1> <!-- Título mais genérico -->
+                <h1>Box Breathing</h1>
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema">
                     <!-- Ícone Sol (Tema Claro) -->
                     <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -28,8 +28,8 @@
 
             <!-- Configuração -->
             <div class="config">
-                <!-- Seleção de Técnica -->
-                <div class="config-item">
+                <!-- Seleção de Técnica - OCULTO mas presente -->
+                <div class="config-item" style="display: none;">
                     <label for="technique-select">Técnica:</label>
                     <select id="technique-select" class="control">
                         <option value="box" selected>Box Breathing</option>
@@ -39,11 +39,21 @@
                     </select>
                 </div>
 
+                <!-- Seleção de Padrão de Respiração -->
+                <div class="config-item">
+                    <label for="pattern-select">Padrão:</label>
+                    <select id="pattern-select" class="control">
+                        <option value="4" selected>4-4-4-4</option>
+                        <option value="5">5-5-5-5</option>
+                        <option value="6">6-6-6-6</option>
+                    </select>
+                </div>
+
                 <!-- Seleção de Tempo Total -->
                 <div class="config-item">
-                    <label for="duration-select">Tempo total:</label>
+                    <label for="duration-select">Duração:</label>
                     <select id="duration-select">
-                        <option value="300">5 minutos</option> <!-- Valores em segundos -->
+                        <option value="300">5 minutos</option>
                         <option value="600" selected>10 minutos</option>
                         <option value="900">15 minutos</option>
                     </select>
@@ -66,79 +76,92 @@
                 <div id="box-container">
                 <div id="breathing-box"></div>
                 <div id="progress-indicator"></div>
-                <!-- NOVO: Contador de Fase -->
+                <!-- Contador de Fase -->
                 <div id="phase-countdown"></div>
                 </div>
                 <div id="instruction">Pronto para começar?</div>
                 <div id="timer">10:00</div>
                 
-                    
                 <!-- Barra de progresso total -->
-                        <div class="progress-container">
-                            <div class="progress-bar" id="progress-bar">0%</div>
-                            <div class="phase-markers">
-                                <div class="phase-marker" data-phase="inhale">
-                                    <div class="marker-fill"></div>
-                                    <span class="marker-label">Inspira</span>
-                                </div>
-                                <div class="phase-marker" data-phase="hold-in">
-                                    <div class="marker-fill"></div>
-                                    <span class="marker-label">Segura</span>
-                                </div>
-                                <div class="phase-marker" data-phase="exhale">
-                                    <div class="marker-fill"></div>
-                                    <span class="marker-label">Expira</span>
-                                </div>
-                                <div class="phase-marker" data-phase="hold-out">
-                                    <div class="marker-fill"></div>
-                                    <span class="marker-label">Segura</span>
-                                </div>
-                            </div>
-                            <div class="progress-marker" style="left:20%"></div>
-                            <div class="progress-marker" style="left:40%"></div>
-                            <div class="progress-marker" style="left:60%"></div>
-                            <div class="progress-marker" style="left:80%"></div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar">0%</div>
+                    <div class="phase-markers">
+                        <div class="phase-marker" data-phase="inhale">
+                            <div class="marker-fill"></div>
+                            <span class="marker-label">Inspira</span>
+                        </div>
+                        <div class="phase-marker" data-phase="hold-in">
+                            <div class="marker-fill"></div>
+                            <span class="marker-label">Segura</span>
+                        </div>
+                        <div class="phase-marker" data-phase="exhale">
+                            <div class="marker-fill"></div>
+                            <span class="marker-label">Expira</span>
+                        </div>
+                        <div class="phase-marker" data-phase="hold-out">
+                            <div class="marker-fill"></div>
+                            <span class="marker-label">Segura</span>
                         </div>
                     </div>
+                </div>
+            </div>
         
-        <!-- Área de instruções -->
-        <div id="instructions">        
-
-            <!-- Botão de Parar (aparece durante o exercício) -->
-            <div class="stop-button-container">
-                <button id="stop-btn" class="hidden">Parar</button>
-            </div>
-
-            <!-- Seção Saiba Mais simplificada -->
-            <div id="saiba-mais" class="saiba-mais">
-                <div class="saiba-mais-header">
-                    <span class="info-icon">ⓘ</span>
-                    <span>Saiba mais sobre a técnica</span>
+            <!-- Área de instruções -->
+            <div id="instructions">        
+                <!-- Botão de Parar (aparece durante o exercício) -->
+                <div class="stop-button-container">
+                    <button id="stop-btn" class="hidden">Parar</button>
                 </div>
-                <div class="saiba-mais-content">
-                    <p>Selecione uma técnica para ver mais informações.</p>
-                </div>
-            </div>
 
-            <!-- Controles avançados -->
-            <button class="toggle-advanced" id="toggle-advanced">Mostrar Controles Avançados</button>
-
-            <div class="advanced-controls" id="advanced-controls" style="display: none;"> <!-- Começa escondido -->
-                <!-- Controles do Box Breathing (podem ser escondidos/mostrados dinamicamente) -->
-                <div class="control-group" data-technique="box">
-                    <h3>Duração de cada fase (Box Breathing)</h3>
-                    <div>
-                        <label for="phase-duration">Duração (segundos):</label>
-                        <input type="range" id="phase-duration" min="2" max="8" value="4" step="1">
-                        <span id="phase-duration-value">4</span> segundos
+                <!-- Seção Saiba Mais -->
+                <div id="saiba-mais" class="saiba-mais">
+                    <div class="saiba-mais-header">
+                        <span class="info-icon">ⓘ</span>
+                        <span>Sobre Box Breathing</span>
+                        <span class="expand-icon">▼</span>
                     </div>
-                    <p class="help-text">Ajusta as 4 fases do Box Breathing.</p>
+                    <div class="saiba-mais-content">
+                        <h3>A Técnica dos Navy SEALs</h3>
+                        <p>O <strong>Box Breathing</strong> (Respiração Quadrada) é uma técnica poderosa utilizada pelos Navy SEALs, as forças especiais da Marinha dos EUA. Foi popularizada pelo Comandante Mark Divine, ex-Navy SEAL e autor de "The Way of the SEAL".</p>
+                        
+                        <h4>Como funciona:</h4>
+                        <p>A técnica segue um padrão quadrado simples, onde cada fase tem a mesma duração:</p>
+                        <ul>
+                            <li><strong>Inspire</strong> pela contagem escolhida (4, 5 ou 6)</li>
+                            <li><strong>Segure</strong> o ar pela mesma contagem</li>
+                            <li><strong>Expire</strong> pela mesma contagem</li>
+                            <li><strong>Segure</strong> vazio pela mesma contagem</li>
+                        </ul>
+                        
+                        <h4>Benefícios comprovados:</h4>
+                        <ul>
+                            <li><strong>Controle Mental:</strong> Ajuda no controle da atenção e gestão do estado emocional</li>
+                            <li><strong>Foco Aprimorado:</strong> Fortalece a concentração e clareza mental</li>
+                            <li><strong>Redução do Estresse:</strong> Ativa o sistema nervoso parassimpático, promovendo calma</li>
+                            <li><strong>Preparação Mental:</strong> Ideal antes de situações desafiadoras ou estressantes</li>
+                            <li><strong>Recuperação:</strong> Excelente para recuperação após atividades intensas</li>
+                        </ul>
+                        
+                        <p class="quote">"Uma arma secreta que me dava vantagem sobre outros SEALs" - Comandante Mark Divine</p>
+                    </div>
                 </div>
-                <!-- Adicionar aqui grupos de controle para outras técnicas se necessário -->
+
+                <!-- Controles avançados OCULTOS -->
+                <div class="advanced-controls hidden" id="advanced-controls">
+                    <div class="control-group" data-technique="box">
+                        <h3>Duração de cada fase (Box Breathing)</h3>
+                        <div>
+                            <label for="phase-duration">Duração (segundos):</label>
+                            <input type="range" id="phase-duration" min="2" max="8" value="4" step="1">
+                            <span id="phase-duration-value">4</span> segundos
+                        </div>
+                        <p class="help-text">Ajusta as 4 fases do Box Breathing.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Script principal -->
-        <script src="script.js"></script>
+        <script src="script-simplified.js"></script>
     </body>
 </html>
