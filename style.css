@@ -1,109 +1,40 @@
-/* style.css (Completo e Atualizado) */
+/* style-simplified.css - Versão Simplificada para Box Breathing */
 
-/* --- Definição das Variáveis de Cor por Tema e Categoria --- */
-
-/* Categoria: Focus/Anxiety (Paleta Padrão) */
-:root, /* Padrão: tema claro, categoria focus */
-html[data-theme='light'][data-category='focus'] {
-    --destaque-1: #b85a38; /* Laranja queimado */
-    --destaque-2: #814227; /* Marrom avermelhado */
-    --intermediaria: #ffe0d3; /* Pêssego claro */
-    --complementar-1: #38b899; /* Verde água */
-    --complementar-2: #27816b; /* Verde água escuro */
-    --texto-escuro: #333333; /* Cinza escuro */
-    --texto-claro: #ffffff; /* Branco (para botões, etc.) */
-    --fundo: #f9f9f9; /* Cinza muito claro */
-    --card-bg: #ffffff; /* Branco */
+/* --- Variáveis de Cor (Paleta Focus) --- */
+:root,
+html[data-theme='light'] {
+    --destaque-1: #b85a38;
+    --destaque-2: #814227;
+    --intermediaria: #ffe0d3;
+    --complementar-1: #38b899;
+    --complementar-2: #27816b;
+    --texto-escuro: #333333;
+    --texto-claro: #ffffff;
+    --fundo: #f9f9f9;
+    --card-bg: #ffffff;
     --shadow-color: rgba(0, 0, 0, 0.1);
     --input-bg: #ffffff;
     --input-border: #dddddd;
     --progress-bar-bg: linear-gradient(to right, var(--complementar-2), var(--complementar-1), var(--destaque-1));
 }
 
-html[data-theme="dark"][data-category='focus'] {
-    --destaque-1: #e06e4b; /* Laranja claro */
+html[data-theme="dark"] {
+    --destaque-1: #e06e4b;
     --destaque-2: #b85a38;
-    --intermediaria: #573224; /* Marrom escuro */
-    --complementar-1: #4acdad; /* Verde água claro */
+    --intermediaria: #573224;
+    --complementar-1: #4acdad;
     --complementar-2: #38b899;
-    --texto-escuro: #e0e0e0; /* Cinza claro */
-    --texto-claro: #1e1e1e; /* Cinza muito escuro (para botões claros) */
-    --fundo: #121212; /* Preto suave */
-    --card-bg: #1e1e1e; /* Cinza muito escuro */
+    --texto-escuro: #e0e0e0;
+    --texto-claro: #1e1e1e;
+    --fundo: #121212;
+    --card-bg: #1e1e1e;
     --shadow-color: rgba(0, 0, 0, 0.3);
     --input-bg: #2d2d2d;
     --input-border: #444444;
     --progress-bar-bg: linear-gradient(to right, var(--complementar-2), var(--complementar-1), var(--destaque-1));
 }
 
-/* Categoria: Energy/Activation */
-html[data-theme='light'][data-category='energy'] {
-    --destaque-1: #DF1C0A; /* Vermelho vibrante */
-    --destaque-2: #b81708; /* Vermelho mais escuro */
-    --intermediaria: #FADBD8; /* Rosa pálido */
-    --complementar-1: #77524C; /* Marrom */
-    --complementar-2: #5c413d; /* Marrom escuro */
-    --texto-escuro: #262425; /* Preto/Cinza escuro */
-    --texto-claro: #FFFEFA; /* Branco */
-    --fundo: #FFFEFA; /* Branco quase puro */
-    --card-bg: #FFFFFF;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --input-bg: #ffffff;
-    --input-border: #e0e0e0;
-    --progress-bar-bg: linear-gradient(to right, var(--complementar-2), var(--complementar-1), var(--destaque-1));
-}
-
-html[data-theme='dark'][data-category='energy'] {
-    --destaque-1: #E84C3D; /* Vermelho mais claro */
-    --destaque-2: #DF1C0A;
-    --intermediaria: #77524C; /* Marrom como intermediario */
-    --complementar-1: #A87E76; /* Marrom mais claro */
-    --complementar-2: #77524C;
-    --texto-escuro: #FFFEFA; /* Texto claro */
-    --texto-claro: #262425; /* Texto escuro (para botões) */
-    --fundo: #262425; /* Fundo escuro */
-    --card-bg: #3A3738; /* Fundo do card escuro */
-    --shadow-color: rgba(255, 255, 250, 0.1); /* Sombra clara */
-    --input-bg: #4F4A4B;
-    --input-border: #635C5D;
-    --progress-bar-bg: linear-gradient(to right, var(--complementar-2), var(--complementar-1), var(--destaque-1));
-}
-
-/* Categoria: Relaxation/Sleep */
-html[data-theme='light'][data-category='relaxation'] {
-    --destaque-1: #174073; /* Azul profundo */
-    --destaque-2: #113159; /* Azul mais escuro */
-    --intermediaria: #D6E0F0; /* Azul muito claro */
-    --complementar-1: #CDA561; /* Dourado/Ocre */
-    --complementar-2: #a4844d; /* Dourado escuro */
-    --texto-escuro: #174073; /* Azul como texto principal */
-    --texto-claro: #FFFFFF; /* Branco (para botões) */
-    --fundo: #EBF0F5; /* Fundo suave acinzentado/azulado */
-    --card-bg: #FFFFFF; /* Branco */
-    --shadow-color: rgba(23, 64, 115, 0.1);
-    --input-bg: #ffffff;
-    --input-border: #caced4; /* Cinza azulado */
-    --progress-bar-bg: linear-gradient(to right, var(--complementar-2), var(--complementar-1), var(--destaque-1));
-}
-
-html[data-theme='dark'][data-category='relaxation'] {
-    --destaque-1: #5C7EAE; /* Azul mais claro */
-    --destaque-2: #4A6A94;
-    --intermediaria: #2D3748; /* Azul acinzentado escuro */
-    --complementar-1: #E0C28A; /* Dourado mais claro */
-    --complementar-2: #CDA561;
-    --texto-escuro: #E2E8F0; /* Texto claro (quase branco) */
-    --texto-claro: #1A202C; /* Azul muito escuro (para botões) */
-    --fundo: #1A202C; /* Fundo azul escuro/cinza */
-    --card-bg: #2D3748; /* Fundo card azul escuro/cinza */
-    --shadow-color: rgba(226, 232, 240, 0.1); /* Sombra clara */
-    --input-bg: #4A5568;
-    --input-border: #718096;
-    --progress-bar-bg: linear-gradient(to right, var(--complementar-2), var(--complementar-1), var(--destaque-1));
-}
-
-/* --- Estilos Globais e Layout --- */
-
+/* --- Estilos Globais --- */
 * {
     margin: 0;
     padding: 0;
@@ -111,7 +42,6 @@ html[data-theme='dark'][data-category='relaxation'] {
 }
 
 html {
-    /* Transições suaves ao mudar tema ou categoria */
     transition: background-color 0.5s ease, color 0.5s ease;
 }
 
@@ -121,14 +51,14 @@ body {
     color: var(--texto-escuro);
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Alinha no topo para melhor visualização em telas menores */
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
 }
 
 .container {
     width: 100%;
-    max-width: 700px; /* Aumentei um pouco para acomodar melhor os seletores */
+    max-width: 700px;
     background-color: var(--card-bg);
     border-radius: 15px;
     padding: 30px;
@@ -138,24 +68,23 @@ body {
 }
 
 /* --- Header --- */
-
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px; /* Aumentei um pouco o espaço */
-    padding-bottom: 15px; /* Adicionei padding inferior */
-    border-bottom: 1px solid var(--input-border); /* Linha separadora */
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--input-border);
     transition: border-color 0.5s ease;
 }
 
 h1 {
     color: var(--destaque-1);
-    font-size: 24px; /* Ajustei o tamanho */
+    font-size: 28px;
     transition: color 0.5s ease;
 }
 
-.theme-toggle {
+.theme-toggle, .mute-toggle {
     background: none;
     border: none;
     cursor: pointer;
@@ -165,41 +94,47 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--destaque-1); /* Cor do ícone segue o destaque */
+    color: var(--destaque-1);
     background-color: transparent;
     transition: background-color 0.3s, color 0.5s ease;
 }
 
-.theme-toggle:hover {
+.mute-toggle {
+    width: auto;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    border: 1px solid var(--destaque-1);
+}
+
+.theme-toggle:hover, .mute-toggle:hover {
     background-color: var(--intermediaria);
 }
 
 .sun-icon, .moon-icon {
-    fill: currentColor; /* Usa a cor definida no botão */
+    fill: currentColor;
 }
 
-/* Esconde o ícone que não corresponde ao tema atual */
 [data-theme="light"] .moon-icon,
 [data-theme="dark"] .sun-icon {
     display: none;
 }
 
-/* --- Configuração (Seletores e Botão Iniciar) --- */
-
+/* --- Configuração --- */
 .config {
     margin-bottom: 30px;
     display: flex;
-    flex-wrap: wrap; /* Permite quebrar linha se não couber */
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 20px; /* Espaço entre os itens */
+    gap: 20px;
     align-items: center;
 }
 
 .config-item {
     display: flex;
-    flex-direction: column; /* Label em cima, select embaixo */
-    align-items: flex-start; /* Alinha label à esquerda */
-    gap: 5px; /* Espaço entre label e select */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
 }
 
 .config-item label {
@@ -209,17 +144,16 @@ h1 {
     opacity: 0.8;
 }
 
-/* Estilo para ocupar largura total (botão iniciar) */
 .config-item-full {
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-top: 10px; /* Espaço acima do botão */
+    margin-top: 10px;
 }
 
 select, button {
     padding: 10px 15px;
-    border-radius: 8px; /* Bordas mais suaves */
+    border-radius: 8px;
     border: 1px solid var(--input-border);
     font-size: 16px;
     background-color: var(--input-bg);
@@ -229,7 +163,7 @@ select, button {
 }
 
 select {
-    min-width: 200px; /* Largura mínima para os selects */
+    min-width: 120px;
 }
 
 button {
@@ -240,19 +174,15 @@ button {
 #start-btn {
     background-color: var(--destaque-1);
     color: var(--texto-claro);
-    padding: 12px 30px; /* Botão maior */
+    padding: 12px 30px;
 }
 
 #start-btn:hover {
     background-color: var(--destaque-2);
 }
 
-.stop-button-container {
-    margin-top: 20px;
-}
-
 #stop-btn {
-    background-color: #d9534f; /* Vermelho para parar */
+    background-color: #d9534f;
     color: var(--texto-claro);
     padding: 12px 30px;
 }
@@ -263,7 +193,7 @@ button {
 
 /* --- Contagem Regressiva --- */
 #countdown {
-    font-size: 36px; /* Menor que antes */
+    font-size: 36px;
     font-weight: bold;
     color: var(--destaque-1);
     margin: 20px 0;
@@ -271,39 +201,37 @@ button {
 }
 
 .hidden {
-    display: none !important; /* Garante que fique escondido */
+    display: none !important;
 }
 
 /* --- Área de Animação --- */
-
 #animation-container {
     position: relative;
     margin: 30px auto;
     width: 100%;
-    max-width: 400px; /* Reduzi um pouco */
-    aspect-ratio: 1/1; /* Mantém quadrado */
+    max-width: 350px;
+    aspect-ratio: 1/1;
 }
 
 #box-container {
     position: relative;
     width: 100%;
     height: 100%;
-    display: flex; /* Centraliza a caixa/círculo */
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
 #breathing-box {
-    position: absolute; /* Permite controle de posição e transform */
+    position: absolute;
     top: 50%;
     left: 50%;
-    /* transform inicial é definido via JS agora */
     width: 70%;
     height: 70%;
     background-color: transparent;
     border: 4px solid var(--destaque-1);
-    /* border-radius inicial é definido via JS */
-    transition: border-color 0.5s ease, transform 0.8s ease-in-out, border-radius 0.5s ease; /* Transições suaves para escala e borda */
+    border-radius: 10px;
+    transition: border-color 0.5s ease, transform 0.8s ease-in-out;
 }
 
 #progress-indicator {
@@ -311,38 +239,36 @@ button {
     width: 18px;
     height: 18px;
     background-color: var(--complementar-1);
-    border: 2px solid var(--texto-claro); /* Usa texto claro como borda */
+    border: 2px solid var(--texto-claro);
     border-radius: 50%;
-    /* left/top definidos via JS */
-    transform: translate(-50%, -50%); /* Centraliza o ponto na posição calculada */
     z-index: 10;
     box-shadow: 0 0 10px var(--shadow-color);
     transition: background-color 0.5s ease, border-color 0.5s ease;
-    /* display inicial é definido via JS */
+    pointer-events: none;
 }
 
 #instruction {
-    font-size: 24px; /* Menor */
+    font-size: 24px;
     font-weight: bold;
-    margin-top: 25px; /* Mais espaço acima */
+    margin-top: 25px;
     color: var(--destaque-1);
-    min-height: 30px; /* Evita "pulos" quando texto muda */
+    min-height: 30px;
     transition: color 0.5s ease;
 }
 
 #timer {
-    font-size: 22px; /* Menor */
+    font-size: 22px;
     margin-top: 15px;
     color: var(--texto-escuro);
     opacity: 0.8;
     transition: color 0.5s ease, opacity 0.5s ease;
 }
 
-/* --- Barra de Progresso Total --- */
+/* --- Barra de Progresso --- */
 .progress-container {
     position: relative;
     width: 100%;
-    height: 15px; /* Mais fina */
+    height: 15px;
     background-color: var(--input-bg);
     border-radius: 10px;
     margin: 25px 0;
@@ -352,212 +278,123 @@ button {
 
 .progress-bar {
     height: 100%;
-    background: var(--progress-bar-bg); /* Usa a variável do gradiente */
+    background: var(--progress-bar-bg);
     width: 0%;
-    transition: width 1s linear, background 0.5s ease; /* Anima a largura e o gradiente */
+    transition: width 1s linear, background 0.5s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--texto-claro);
-    font-size: 10px; /* Menor */
+    font-size: 10px;
     font-weight: bold;
     text-shadow: 0 0 2px rgba(0,0,0,0.6);
 }
 
-.progress-marker {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    width: 1px; /* Mais fino */
-    background-color: rgba(255,255,255,0.5); /* Marcador claro */
-    z-index: 2;
-}
-/* Ajuste para marcadores escuros em temas claros, se necessário */
-[data-theme="light"] .progress-marker {
-    background-color: rgba(0,0,0,0.2);
-}
-
-/* --- Controles Avançados --- */
-.toggle-advanced {
-    background-color: transparent;
-    color: var(--destaque-1);
-    margin-top: 15px;
-    padding: 5px 10px;
-    border: 1px solid var(--destaque-1);
-    border-radius: 5px;
-    font-size: 14px;
-    transition: background-color 0.3s, color 0.5s ease, border-color 0.5s ease;
-}
-
-.toggle-advanced:hover {
-    background-color: var(--intermediaria);
-}
-
-.advanced-controls {
-    margin-top: 20px;
-    padding: 20px;
-    background-color: var(--input-bg); /* Usa cor de fundo do input/card */
-    border-radius: 10px;
-    text-align: left;
-    border: 1px solid var(--input-border);
-    /* display: none; é controlado pelo JS */
-    transition: background-color 0.5s ease, border-color 0.5s ease;
-}
-
-.control-group {
-    /* display: block/none controlado pelo JS */
-    margin-bottom: 15px; /* Espaço entre grupos de controle */
-    padding-bottom: 15px;
-    border-bottom: 1px dashed var(--input-border);
-}
-.control-group:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.advanced-controls h3 {
-    margin-bottom: 15px;
-    color: var(--destaque-1);
-    font-size: 16px;
-    transition: color 0.5s ease;
-}
-
-.advanced-controls label {
-    display: inline-block;
-    margin-right: 10px;
-    font-size: 14px;
-}
-
-.advanced-controls input[type="range"] {
-    width: 150px;
-    vertical-align: middle;
-    cursor: pointer;
-    /* Estilos do range podem precisar de prefixos de navegador para customização completa */
-}
-
-.advanced-controls span { /* Para o valor do slider */
-    font-weight: bold;
-}
-
-.help-text {
-    font-size: 13px;
-    color: var(--texto-escuro);
-    opacity: 0.7;
-    margin-top: 8px;
-    font-style: italic;
-    transition: color 0.5s ease, opacity 0.5s ease;
-}
-
+/* --- Contador de Fase --- */
 #phase-countdown {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 48px; /* Tamanho grande, mas ajustaremos a opacidade */
-    font-weight: 300; /* Peso leve */
-    color: var(--texto-escuro); /* Usa a cor do texto principal */
-    opacity: 0.35; /* << Deixa bem sutil */
-    z-index: 5; /* Fica acima da caixa/círculo, mas abaixo do ponto */
-    pointer-events: none; /* Não interfere com cliques */
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--texto-escuro);
+    opacity: 0.35;
+    z-index: 5;
+    pointer-events: none;
     transition: opacity 0.3s ease, color 0.5s ease;
-    display: none; /* Começa escondido */
+    display: none;
 }
 
-/* Oculta controles avançados */
-#advanced-controls,
-#toggle-advanced {
-    display: none !important;
-}
-
-/* Estilo para caixa Saiba Mais */
+/* --- Saiba Mais --- */
 .saiba-mais {
-    margin-top: 20px;
-    width: 100%;
-    padding: 15px;
+    margin-top: 30px;
     background-color: var(--intermediaria);
     border: 1px solid var(--input-border);
-    border-radius: 8px;
-    font-size: 0.95em;
-    text-align: left;
-    line-height: 1.4;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .saiba-mais-header {
-    padding: 15px;
+    padding: 15px 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.1em;
+    justify-content: space-between;
     font-weight: bold;
     color: var(--texto-escuro);
-    border-bottom: 1px solid var(--input-border);
-    margin-bottom: 15px;
+    user-select: none;
+}
+
+.saiba-mais-header .info-icon {
+    color: var(--destaque-1);
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+.saiba-mais-header .expand-icon {
+    color: var(--destaque-1);
+    transition: transform 0.3s ease;
 }
 
 .saiba-mais-content {
-    padding: 15px;
-    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    padding: 0 20px;
 }
 
-.info-icon {
+.saiba-mais.expanded .saiba-mais-content {
+    max-height: 800px;
+    padding: 0 20px 20px;
+}
+
+.saiba-mais-content h3 {
     color: var(--destaque-1);
-    font-size: 1.2em;
+    margin: 20px 0 10px;
 }
 
-/* Media queries para telas menores */
-@media screen and (max-width: 480px) {
-    .saiba-mais {
-        margin: 15px 0;
-        padding: 10px;
-        font-size: 0.9em;
-    }
-
-    .saiba-mais-header {
-        padding: 10px;
-    }
-
-    .saiba-mais-content {
-        padding: 10px;
-    }
-}
-
-#progress-indicator {
-    pointer-events: none;
-    cursor: none;
-}
-
-.phase-countdown {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 8rem;
-    font-weight: bold;
+.saiba-mais-content h4 {
     color: var(--destaque-2);
-    opacity: 0.3;
-    pointer-events: none;
-    display: none;
-    font-family: "Times New Roman", serif;
-    z-index: 1000;
+    margin: 15px 0 8px;
 }
 
-#breathing-box {
-    /* ...existing properties... */
-    transition: transform 0.3s ease, background-color 1s ease, border-color 1s ease;
-    background-color: transparent;
+.saiba-mais-content p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+    text-align: left;
 }
 
+.saiba-mais-content ul {
+    text-align: left;
+    margin: 10px 0 10px 20px;
+}
+
+.saiba-mais-content li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.saiba-mais-content .quote {
+    font-style: italic;
+    color: var(--destaque-2);
+    border-left: 3px solid var(--destaque-1);
+    padding-left: 15px;
+    margin: 20px 0;
+}
+
+/* --- Animações --- */
 @keyframes idleBreathing {
     0% {
         transform: translate(-50%, -50%) scale(1);
         border-color: var(--destaque-2);
-        box-shadow: 0 0 15px rgba(184, 90, 56, 0.1); /* Ajuste para var(--destaque-2) */
+        box-shadow: 0 0 15px rgba(184, 90, 56, 0.1);
     }
     50% {
         transform: translate(-50%, -50%) scale(0.95);
         border-color: var(--destaque-1);
-        box-shadow: 0 0 25px rgba(232, 110, 75, 0.2); /* Ajuste para var(--destaque-1) */
+        box-shadow: 0 0 25px rgba(232, 110, 75, 0.2);
     }
     100% {
         transform: translate(-50%, -50%) scale(1);
@@ -578,6 +415,7 @@ button {
     color: var(--texto-escuro);
 }
 
+/* --- Marcadores de Fase --- */
 .phase-markers {
     display: flex;
     justify-content: space-between;
@@ -624,20 +462,38 @@ button {
     background: var(--intermediaria);
 }
 
-.phase-marker.active .marker-fill {
-    background: var(--destaque-1);
-}
-
-/* Cores específicas para cada fase */
 .phase-marker[data-phase="inhale"].active .marker-fill {
-    background: #174073; /* Azul para inspiração */
+    background: #174073;
 }
 
 .phase-marker[data-phase="hold-in"].active .marker-fill,
 .phase-marker[data-phase="hold-out"].active .marker-fill {
-    background: #989FB1; /* Cinza azulado para retenção */
+    background: #989FB1;
 }
 
 .phase-marker[data-phase="exhale"].active .marker-fill {
-    background: #CDA561; /* Dourado para expiração */
+    background: #CDA561;
+}
+
+/* --- Media Queries --- */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    .config {
+        gap: 15px;
+    }
+    
+    .saiba-mais-content {
+        font-size: 0.9em;
+    }
+    
+    #animation-container {
+        max-width: 300px;
+    }
 }
