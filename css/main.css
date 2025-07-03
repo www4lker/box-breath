@@ -73,17 +73,26 @@
 .practice-tab {
     flex: 1;
     max-width: 200px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 2rem;
     border-radius: 25px;
-    border: 2px solid var(--border-color);
+    background: white;
+    border: 2px solid #e0e0e0;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
+    transition: var(--transition-smooth);
+    color: var(--primary-color);
 }
 
 .practice-tab:hover {
     border-color: var(--primary-color);
     transform: translateY(-2px);
+}
+
+.practice-tab.active {
+    background: var(--bg-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(74,144,226,0.10);
+    z-index: 1;
 }
 
 .timer-selection {
@@ -373,4 +382,49 @@ header nav #themeBtn:hover {
     .animation-style-selection {
         margin-bottom: 1rem;
     }
+}
+
+.universal-principles {
+    background: var(--background-universal, #f8f9fa);
+    color: var(--text-universal, #222);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-top: 3rem;
+    transition: background 0.3s, color 0.3s;
+}
+
+body[data-theme="dark"] .universal-principles {
+    background: var(--background-universal-dark, #23272e);
+    color: var(--text-universal-dark, #f1f1f1);
+}
+
+.universal-principles h3, .universal-principles h4 {
+    color: var(--primary-color);
+}
+
+/* Modal e atalho para disclaimer na aba prática */
+.disclaimer-link {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.08);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    z-index: 10000;
+    opacity: 0.7;
+    backdrop-filter: blur(10px);
+}
+.disclaimer-link:hover {
+    background: rgba(0,0,0,0.18);
+    color: var(--primary-color);
+    opacity: 1;
+    transform: translateY(-2px);
+}
+body.dark-theme .disclaimer-link {
+    background: rgba(255,255,255,0.08);
+    color: #aaa;
 }

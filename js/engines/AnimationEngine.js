@@ -359,29 +359,113 @@ export class AnimationEngine {
 
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
-    const maxRadius = Math.min(centerX, centerY) * 0.8;
-    const minRadius = maxRadius * 0.3;
+    const maxRadius = Math.min(centerX, centerY) * 0.7; // Reduzido para dar mais espaço
+    const minRadius = 40; // Raio mínimo mais definido
     
-    // Círculo externo (contorno da "caixa")
+    // 🎯 CORES MELHORADAS - baseadas nas fases respiratórias
+    const phaseColors = {
+      'INHALE': { primary: '#4fc3f7', secondary: '#29b6f6', accent: '#03a9f4' },     // Azul inspiração
+      'HOLD_IN': { primary: '#ab47bc', secondary: '#8e24aa', accent: '#9c27b0' },   // Roxo retenção cheia
+      'EXHALE': { primary: '#66bb6a', secondary: '#4caf50', accent: '#43a047' },    // Verde expiração
+      'HOLD_OUT': { primary: '#ff7043', secondary: '#ff5722', accent: '#f4511e' }  // Laranja retenção vazia
+    };
+    
+    const colors = phaseColors[currentPhase.type] || phaseColors['INHALE'];
+    
+    // 🎯 CÁLCULO DO RAIO com animação suave
+    let radiusProgress = progress;
+    
+    // Easing suave para inspiração e expiração
+    if (currentPhase.type === 'INHALE' || currentPhase.type === 'EXHALE') {
+      // Easing quadrático para movimento mais natural
+      radiusProgress = currentPhase.type === 'INHALE' ? 
+        progress * progress : // Ease-in para inspiração
+        1 - ((1 - progress) * (1 - progress)); // Ease-out para expiração
+    }
+    
+    const currentRadius = minRadius + (maxRadius - minRadius) * radiusProgress;
+    
+    // 🎯 EFEITO DE PULSAÇÃO durante retenções
+    let pulseEffect = 1.0;
+    if (currentPhase.type === 'HOLD_IN' || currentPhase.type === 'HOLD_OUT') {
+      const pulseSpeed = 2; // Velocidade da pulsação
+      pulseEffect = 1 + Math.sin(phaseElapsed * pulseSpeed) * 0.05; // Pulsação sutil de 5%
+    }
+    
+    const finalRadius = currentRadius * pulseEffect;
+    
+    // 🎯 CAMADA 1: Aura externa (glow effect)
+    this.ctx.save();
+    const auraGradient = this.ctx.createRadialGradient(
+      centerX, centerY, finalRadius * 0.6,
+      centerX, centerY, finalRadius * 1.4
+    );
+    auraGradient.addColorStop(0, colors.primary + '40'); // 25% opacity
+    auraGradient.addColorStop(0.7, colors.secondary + '20'); // 12% opacity
+    auraGradient.addColorStop(1, colors.accent + '00'); // Transparente
+    
+    this.ctx.fillStyle = auraGradient;
     this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, maxRadius, 0, 2 * Math.PI);
-    this.ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
-    this.ctx.lineWidth = this.config.legacy.strokeWidth;
-    this.ctx.stroke();
-    
-    // Círculo interno (a "bolinha" que se move)
-    const currentRadius = minRadius + (maxRadius - minRadius) * (progress * 0.3);
-    const phaseType = currentPhase.type.toLowerCase();
-    const colorVar = `--color-${phaseType}`;
-    const color = getComputedStyle(document.documentElement).getPropertyValue(colorVar).trim();
-    
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, currentRadius, 0, 2 * Math.PI);
-    this.ctx.fillStyle = color;
+    this.ctx.arc(centerX, centerY, finalRadius * 1.4, 0, 2 * Math.PI);
     this.ctx.fill();
+    this.ctx.restore();
     
-    // Desenha o texto central
-    this._drawCentralText(currentPhase, phaseElapsed, centerX, centerY);
+    // 🎯 CAMADA 2: Círculo principal com gradiente radial
+    this.ctx.save();
+    const mainGradient = this.ctx.createRadialGradient(
+      centerX - finalRadius * 0.3, centerY - finalRadius * 0.3, 0,
+      centerX, centerY, finalRadius
+    );
+    mainGradient.addColorStop(0, colors.primary + 'E6'); // 90% opacity
+    mainGradient.addColorStop(0.6, colors.secondary + 'CC'); // 80% opacity
+    mainGradient.addColorStop(1, colors.accent + 'B3'); // 70% opacity
+    
+    // Sombra suave
+    this.ctx.shadowColor = colors.primary + '80'; // 50% opacity
+    this.ctx.shadowBlur = 15;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 5;
+    
+    this.ctx.fillStyle = mainGradient;
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, finalRadius, 0, 2 * Math.PI);
+    this.ctx.fill();
+    this.ctx.restore();
+    
+    // 🎯 CAMADA 3: Contorno elegante
+    this.ctx.save();
+    this.ctx.strokeStyle = colors.accent;
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowColor = colors.accent + '60'; // 38% opacity
+    this.ctx.shadowBlur = 8;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
+    
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, finalRadius, 0, 2 * Math.PI);
+    this.ctx.stroke();
+    this.ctx.restore();
+    
+    // 🎯 CAMADA 4: Círculo interno decorativo (durante retenções)
+    if (currentPhase.type === 'HOLD_IN' || currentPhase.type === 'HOLD_OUT') {
+      this.ctx.save();
+      const innerRadius = finalRadius * 0.3;
+      const innerGradient = this.ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, innerRadius
+      );
+      innerGradient.addColorStop(0, colors.primary + 'B3'); // 70% opacity
+      innerGradient.addColorStop(1, colors.primary + '40'); // 25% opacity
+      
+      this.ctx.fillStyle = innerGradient;
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+    
+    // 🎯 TEXTO CENTRAL aprimorado
+    this._drawEnhancedCentralText(currentPhase, phaseElapsed, centerX, centerY, colors);
     
     this.ctx.restore();
   }
@@ -529,6 +613,59 @@ export class AnimationEngine {
       const remainingTime = Math.max(0, currentPhase.duration - phaseElapsed);
       this.ctx.font = '14px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
       this.ctx.fillText(`${Math.ceil(remainingTime)}s`, centerX, centerY + 15);
+    }
+    
+    this.ctx.restore();
+  }
+
+  _drawEnhancedCentralText(currentPhase, phaseElapsed, centerX, centerY, colors) {
+    // Texto aprimorado para animação Legacy
+    this.ctx.save();
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.globalAlpha = this.globalAlpha;
+    
+    // Fundo semi-transparente para melhor legibilidade
+    const bgRadius = 60;
+    const bgGradient = this.ctx.createRadialGradient(
+      centerX, centerY, 0,
+      centerX, centerY, bgRadius
+    );
+    bgGradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    bgGradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.85)');
+    bgGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    
+    this.ctx.fillStyle = bgGradient;
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, bgRadius, 0, 2 * Math.PI);
+    this.ctx.fill();
+    
+    // Texto principal da fase com sombra
+    this.ctx.save();
+    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    this.ctx.shadowBlur = 4;
+    this.ctx.shadowOffsetX = 1;
+    this.ctx.shadowOffsetY = 1;
+    
+    this.ctx.fillStyle = colors.accent;
+    this.ctx.font = 'bold 22px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
+    const phaseText = this._getPhaseText(currentPhase.type);
+    this.ctx.fillText(phaseText, centerX, centerY - 12);
+    this.ctx.restore();
+    
+    // Contador de tempo (se aplicável)
+    if (currentPhase.duration > 0) {
+      const remainingTime = Math.max(0, currentPhase.duration - phaseElapsed);
+      this.ctx.save();
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+      this.ctx.shadowBlur = 2;
+      this.ctx.shadowOffsetX = 1;
+      this.ctx.shadowOffsetY = 1;
+      
+      this.ctx.fillStyle = colors.primary;
+      this.ctx.font = '16px "Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
+      this.ctx.fillText(`${Math.ceil(remainingTime)}s`, centerX, centerY + 15);
+      this.ctx.restore();
     }
     
     this.ctx.restore();

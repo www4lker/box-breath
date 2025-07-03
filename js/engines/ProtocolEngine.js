@@ -48,9 +48,12 @@ export class ProtocolEngine {
     this._clearTimers();
     this.state = ProtocolStates.IDLE;
     this.currentProtocol = null;
+    this.currentStageIndex = 0;
+    this.progress = {};
     this.animationEngine.stop();
     log("Protocolo cancelado pelo usuário.");
-    // Não sair da página - mantém na seção de prática para o usuário escolher outro exercício
+    // Atualiza a UI para refletir o cancelamento
+    this.uiController.update({ engineState: this });
   }
 
   _startStage(stageIndex) {
@@ -59,8 +62,13 @@ export class ProtocolEngine {
     this.state = ProtocolStates.RUNNING;
     this.progress.stageStartTime = Date.now();
     
-    this.animationEngine.loadPattern(stage.pattern);
-    this.animationEngine.start();
+    // Garante que a animação anterior foi completamente parada
+    this.animationEngine.stop();
+    setTimeout(() => {
+      this.animationEngine.loadPattern(stage.pattern);
+      this.animationEngine.fadeIn(1.0);
+      this.animationEngine.start();
+    }, 100);
     
     log(`Iniciando Estágio ${stageIndex + 1}/${this.currentProtocol.stages.length}: ${stage.pattern.name}`);
     this._startMainLoop();
@@ -71,6 +79,9 @@ export class ProtocolEngine {
     if (nextStageIndex >= this.currentProtocol.stages.length) {
       return this._finishProtocol();
     }
+    
+    // Para o loop principal durante a transição
+    this._clearTimers();
     this.state = ProtocolStates.TRANSITION;
     this.uiController.update({ engineState: this });
     this.animationEngine.fadeOut(1.5);

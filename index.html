@@ -675,13 +675,6 @@
             margin-top: 3rem;
         }
 
-        .pattern-explanation {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 15px;
-            margin-top: 3rem;
-        }
-
         /* Estilos para o App de Prática */
         .practice-app-container {
             display: flex;
@@ -735,37 +728,15 @@
         }
 
         .global-controls {
-            display: flex;
-            justify-content: center;
-            margin: 1rem 0;
-            padding: 0.5rem;
+            display: none; /* Removido - não usado mais */
         }
 
         .audio-controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none; /* Removido - não usado mais */
         }
 
         #audioBtn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            flex-shrink: 0;
-        }
-
-        #audioBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: none; /* Removido - substituído por .audio-control */
         }
 
         /* Estilos para acessibilidade */
@@ -796,20 +767,291 @@
             background: var(--primary-color);
         }
 
-        /* Animações de entrada para o app de prática */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        /* Cards de detalhes dos padrões */
+        .pattern-detail-card {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pattern-detail-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        .pattern-detail-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        body.dark-theme .pattern-detail-card {
+            background: #2c3e50;
+        }
+        
+        body.dark-theme .pattern-detail-card p {
+            color: #ecf0f1;
+        }
+        
+        /* Link do disclaimer */
+        .disclaimer-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .disclaimer-link:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        body.dark-theme .disclaimer-link {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+        
+        /* Modal do disclaimer */
+        .disclaimer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        
+        .disclaimer-content {
+            background: white;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .disclaimer-content h1, .disclaimer-content h2, .disclaimer-content h3 {
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .disclaimer-content ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .disclaimer-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .disclaimer-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        body.dark-theme .disclaimer-content {
+            background: #2c3e50;
+            color: #ecf0f1;
+        }
+        
+        @media (max-width: 768px) {
+            .disclaimer-link {
+                bottom: 10px;
+                right: 10px;
+                font-size: 0.75rem;
             }
         }
 
-        .practice-app-container > * {
-            animation: slideIn 0.5s ease-out forwards;
+        /* Estilos para Textos Guia dos Protocolos */
+        .stage-guide {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .stage-header {
+            margin-bottom: 0.75rem;
+        }
+
+        .stage-number {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stage-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin: 0.25rem 0;
+            font-weight: 600;
+        }
+
+        .stage-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .stage-description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .transition-state {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(123, 104, 238, 0.1), rgba(72, 209, 204, 0.1));
+            border-radius: 10px;
+            border: 2px dashed var(--accent-color);
+        }
+
+        .transition-state h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .protocol-completed {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(26, 188, 156, 0.1), rgba(72, 209, 204, 0.1));
+            border-radius: 15px;
+            border: 2px solid var(--accent-color);
+        }
+
+        .protocol-completed h3 {
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .protocol-ready {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 10px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .protocol-ready h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .protocol-intention {
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsividade para textos guia */
+        @media (max-width: 768px) {
+            .stage-guide {
+                padding: 0.75rem;
+            }
+            
+            .stage-title {
+                font-size: 1.1rem;
+            }
+            
+            .stage-description {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Botão de áudio minimalista e bem alinhado */
+        .audio-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            color: #666;
+            min-width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .audio-control:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .audio-control:active {
+            transform: translateY(0);
+        }
+
+        .audio-control.muted {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .audio-control.muted:hover {
+            background: rgba(255, 0, 0, 0.15);
+            border-color: #ff5252;
+            color: #ff5252;
+        }
+
+        /* 🎯 Nova área de descrição minimalista para padrões */
+        .pattern-description {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: rgba(74, 144, 226, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .pattern-description p {
+            margin: 0;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* Estado quando um padrão está ativo */
+        .pattern-description.active {
+            background: rgba(74, 144, 226, 0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .pattern-description.active p {
+            color: var(--primary-color);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -907,6 +1149,17 @@
                     <li>Ativação de mecanismos de autocura</li>
                 </ul>
             </div>
+        </div>
+        
+        <!-- Disclaimer de Segurança -->
+        <div style="background: #fff3cd; border: 2px solid #ffeaa7; border-radius: 15px; padding: 2rem; margin-top: 3rem;">
+            <h3 style="color: #856404; margin-bottom: 1rem;">⚠️ Aviso Importante de Segurança</h3>
+            <p style="color: #856404; line-height: 1.8; margin-bottom: 1rem;">
+                As técnicas de respiração apresentadas neste site são poderosas e devem ser praticadas com responsabilidade. 
+                <strong>Consulte sempre um médico antes de iniciar qualquer programa de exercícios respiratórios</strong>, 
+                especialmente se você possui condições médicas preexistentes.
+            </p>
+            <button class="btn" onclick="showDisclaimer()" style="background: #856404; margin-top: 0;">Ler Orientações Completas de Segurança</button>
         </div>
     </section>
 
@@ -1193,6 +1446,29 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Disclaimer Legal -->
+        <div class="science-disclaimer-card" id="science-disclaimer" tabindex="0" style="margin: 2.5rem auto 0; max-width: 800px; background: #fff3cd; border: 2px solid #ffeaa7; border-radius: 15px; padding: 2rem; color: #856404;">
+            <h3 style="color: #856404; margin-bottom: 1rem;">⚠️ Orientações de Segurança e Termo de Responsabilidade</h3>
+            <div style="font-size: 1.05rem; line-height: 1.7;">
+                <p><strong>Antes de iniciar qualquer técnica de respiração, leia atentamente as orientações de segurança.</strong></p>
+                <ul style="margin-bottom: 1rem;">
+                    <li>Consulte sempre um médico antes de iniciar qualquer programa de exercícios respiratórios, especialmente se possui condições médicas preexistentes.</li>
+                    <li>Não pratique enquanto dirige, opera máquinas ou próximo à água.</li>
+                    <li>Interrompa imediatamente se sentir tontura forte, dor no peito, náusea ou qualquer desconforto significativo.</li>
+                </ul>
+                <p>O uso das técnicas é de responsabilidade exclusiva do praticante. Para o texto completo, consulte o <a href="#" onclick="showDisclaimerModal();return false;" style="color: #856404; text-decoration: underline; font-weight: bold;">disclaimer legal completo</a>.</p>
+            </div>
+        </div>
+        <!-- Modal do Disclaimer Completo -->
+        <div class="disclaimer-modal" id="disclaimerModal">
+            <div class="disclaimer-content">
+                <span class="disclaimer-close" onclick="closeDisclaimerModal()">&times;</span>
+                <div id="disclaimerFullText" style="white-space: pre-line; font-size: 1.05rem; line-height: 1.7; color: #222;">
+                    <!-- Conteúdo do disclaimer será inserido via JS -->
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Seção de Padrões -->
@@ -1203,35 +1479,35 @@
         </p>
 
         <div class="patterns-overview">
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(0)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(0)" title="Proporção 1:1.75:2 - Forte ativação parassimpática para relaxamento profundo">
                 <div class="pattern-code">4-7-8-0</div>
                 <div class="pattern-name">Sossega Leão</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(1)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(1)" title="Simetria perfeita - Induz coerência cardíaca e estados de fluxo cognitivo">
                 <div class="pattern-code">6-6-6-6</div>
                 <div class="pattern-name">Box Plus</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(2)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(2)" title="Proporção 2.5:1 - Mantém energia suave com dominância simpática controlada">
                 <div class="pattern-code">5-0-2-0</div>
                 <div class="pattern-name">Energia Calma</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(3)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(3)" title="Proporção 1:1.5 - Ativação vagal suave para tranquilidade">
                 <div class="pattern-code">4-0-6-0</div>
                 <div class="pattern-name">Calma</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(4)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(4)" title="Retenção vazia substancial - Treina tolerância ao CO2 e resistência mental">
                 <div class="pattern-code">5-0-8-5</div>
                 <div class="pattern-name">Endurance</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(5)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(5)" title="Proporção 1:2.67 - Limpa CO2 residual e prepara o sistema respiratório">
                 <div class="pattern-code">3-0-8-1.8</div>
                 <div class="pattern-name">Melhor Ventilação</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(6)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(6)" title="Expiração dupla - Promove paz mental através de ativação parassimpática">
                 <div class="pattern-code">3-0-6-0</div>
                 <div class="pattern-name">Tranquilidade</div>
             </div>
-            <div class="pattern-mini" onclick="PranaHub.practicePattern(7)">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(7)" title="Retenções equilibradas - Estado de alerta calmo ideal para performance">
                 <div class="pattern-code">5.5-5.5-5.5-0</div>
                 <div class="pattern-name">Tactical</div>
             </div>
@@ -1247,6 +1523,68 @@
                 <li><strong>0</strong> segundos de pausa com pulmões vazios</li>
             </ul>
             <p style="margin-top: 1.5rem;">A escolha de cada proporção ativa diferentes respostas do sistema nervoso, permitindo personalização precisa dos efeitos desejados.</p>
+        </div>
+
+        <div class="universal-principles" style="margin-top: 3rem; background: #f8f9fa; padding: 2rem; border-radius: 15px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Princípios Universais da Prática</h3>
+            <h4 style="margin-top: 1.5rem;">1. Respiração Nasal</h4>
+            <p>Sempre inspire pelo nariz (exceto indicação específica). O nariz filtra, aquece e umidifica o ar, além de produzir óxido nítrico - um vasodilatador que melhora a oxigenação. A respiração nasal também ativa o diafragma mais eficientemente.</p>
+            <h4 style="margin-top: 1.5rem;">2. Respiração Diafragmática</h4>
+            <p>Respire "com a barriga". Na inspiração, o abdômen expande; na expiração, contrai. Isso maximiza a eficiência ventilatória e ativa mecanorreceptores no diafragma que sinalizam relaxamento ao sistema nervoso.</p>
+            <h4 style="margin-top: 1.5rem;">3. Progressão Gradual</h4>
+            <p>Comece com tempos menores e aumente gradualmente. Se o padrão indica 4-7-8, iniciantes podem começar com 2-3.5-4 e progredir ao longo de semanas. Respeite seus limites.</p>
+            <h4 style="margin-top: 1.5rem;">4. Postura Adequada</h4>
+            <p>Mantenha coluna ereta mas relaxada. Sentado: pés no chão, mãos sobre coxas. Deitado: braços ao lado do corpo, palmas para cima. A postura adequada facilita a expansão pulmonar completa.</p>
+            <h4 style="margin-top: 1.5rem;">5. Consistência Rítmica</h4>
+            <p>Mantenha o ritmo constante. Use contagem mental suave ("um... dois... três...") ou o timer visual do app. A consistência é mais importante que a precisão absoluta.</p>
+            <h4 style="margin-top: 1.5rem;">6. Atenção Gentil</h4>
+            <p>Observe sem forçar. Se a mente divagar, gentilmente retorne ao padrão. A qualidade da atenção é tão importante quanto a técnica mecânica.</p>
+            <h4 style="margin-top: 1.5rem;">7. Sinais do Corpo</h4>
+            <p>Tontura leve é normal no início. Tontura forte, náusea ou desconforto significativo são sinais para parar e retornar à respiração natural. Desenvolva sensibilidade aos feedbacks do seu corpo.</p>
+        </div>
+
+        <div class="pattern-details" style="margin-top: 3rem;">
+            <h3 style="color: var(--primary-color); margin-bottom: 2rem; text-align: center;">Análise Detalhada dos Padrões</h3>
+            
+            <div class="pattern-detail-card">
+                <h4>Sossega Leão (4-7-8-0)</h4>
+                <p>Similar ao "4-7-8 breathing" do Dr. Andrew Weil. A proporção 1:1.75:2 cria forte ativação parassimpática. A retenção prolongada permite acúmulo controlado de CO2, que paradoxalmente acalma o sistema nervoso através da vasodilatação cerebral. Ideal para ansiedade e preparação para o sono.</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Box Plus (6-6-6-6)</h4>
+                <p>Expansão do Box Breathing clássico dos Navy SEALs. A simetria perfeita facilita entrada em estados de coerência cardíaca. Com 2.5 respirações/minuto, aproxima-se do ritmo de ressonância cardiovascular que maximiza a variabilidade da frequência cardíaca (VFC).</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Energia Calma (5-0-2-0)</h4>
+                <p>Inverte a sabedoria convencional com expiração curta (proporção 2.5:1). Mantém leve dominância simpática sem extremos, criando energia sustentável. Excelente para início de projetos ou quando precisar de alerta sem ansiedade.</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Calma (4-0-6-0)</h4>
+                <p>Proporção 1:1.5 favorece o sistema parassimpático. A expiração prolongada ativa fortemente o nervo vago, reduzindo frequência cardíaca e pressão arterial. Simples e eficaz para momentos de estresse agudo.</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Endurance (5-0-8-5)</h4>
+                <p>A retenção após expiração (bahya kumbhaka) treina tolerância ao CO2 e pode melhorar eficiência respiratória. Simula condições de esforço controlado, útil para preparação atlética ou desenvolvimento de resistência mental.</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Melhor Ventilação (3-0-8-1.8)</h4>
+                <p>Proporção extrema 1:2.67 maximiza eliminação de CO2. A breve retenção vazia intensifica o efeito. Excelente para "limpar" o sistema após sono ou períodos de respiração superficial.</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Tranquilidade (3-0-6-0)</h4>
+                <p>Versão suavizada do padrão calma. Mantém ativação parassimpática significativa mas permite maior frequência respiratória. Ideal para relaxamento ativo ou meditação em movimento.</p>
+            </div>
+
+            <div class="pattern-detail-card">
+                <h4>Tactical (5.5-5.5-5.5-0)</h4>
+                <p>Padrão quase simétrico com leve ênfase na expiração. As retenções equilibradas criam estado de "vigilância relaxada" - calma com prontidão. Usado por forças especiais para manter performance sob pressão.</p>
+            </div>
         </div>
     </section>
 
@@ -1283,18 +1621,14 @@
                         <button class="style-btn" data-style="Box">Box</button>
                         <button class="style-btn" data-style="Legacy">Legacy</button>
                     </div>
-                    <div class="global-controls">
-                        <button id="audioBtn" title="Silenciar/ativar áudio" aria-label="Silenciar ou ativar áudio">🔊</button>
-                    </div>
                     <div class="pattern-row">
                         <select id="patternSelect" aria-label="Selecionar padrão de respiração"></select>
                         <button id="startPatternBtn" aria-label="Iniciar respiração padrão">Iniciar</button>
                         <button id="stopBtn" aria-label="Parar respiração" disabled>Parar</button>
+                        <button id="audioBtn" class="audio-control" title="Controlar áudio" aria-label="Ativar/desativar áudio" style="display: inline-block;">🔊</button>
                     </div>
-                    <div class="pattern-info status-display">
-                        <h3 id="patternName"></h3>
-                        <p id="phaseName"></p>
-                        <p id="patternTimer"></p>
+                    <div class="pattern-description">
+                        <p id="patternDescription">Selecione um padrão de respiração para começar sua prática</p>
                     </div>
                 </section>
 
@@ -1303,6 +1637,7 @@
                         <select id="protocolSelect" aria-label="Selecionar protocolo de respiração"></select>
                         <button id="startProtocolBtn" aria-label="Iniciar protocolo">Confirmar Início</button>
                         <button id="cancelProtocolBtn" aria-label="Cancelar protocolo" disabled>Cancelar Protocolo</button>
+                        <button class="audio-control" title="Controlar áudio" aria-label="Ativar/desativar áudio" style="display: inline-block;">🔊</button>
                     </div>
                     <div class="protocol-status">
                         <div id="stageStatus" tabindex="0"></div>
@@ -1313,8 +1648,35 @@
                 </section>
             </div>
         </div>
+        <a href="#" class="disclaimer-link" onclick="showDisclaimerModal();return false;" title="Orientações de Segurança e Termo de Responsabilidade">⚠️ Orientações de Segurança</a>
     </section>
     <script type="module" src="js/main.js"></script>
+    <script>
+        // Modal do disclaimer legal completo
+        function showDisclaimerModal() {
+            const modal = document.getElementById('disclaimerModal');
+            const content = document.getElementById('disclaimerFullText');
+            if (modal && content) {
+                fetch('breathwork-safety-disclaimer.md')
+                    .then(r => r.text())
+                    .then(text => {
+                        content.textContent = text;
+                        modal.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                    });
+            }
+        }
+        function closeDisclaimerModal() {
+            const modal = document.getElementById('disclaimerModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDisclaimerModal();
+        });
+    </script>
 
 </body>
 </html>

@@ -2,6 +2,7 @@
 import { patterns } from '../data/patterns.js';
 import { protocols } from '../data/protocols.js';
 import { ProtocolStates } from '../engines/ProtocolEngine.js';
+import { getStageGuide } from '../data/protocolStageGuides.js';
 
 export class UIController {
   constructor() {
@@ -36,9 +37,38 @@ export class UIController {
 
   initAudioState() {
     const isMuted = !this.audioEngine.enabled;
-    this.audioBtn.setAttribute('aria-pressed', !isMuted);
-    this.audioBtn.setAttribute('data-tooltip', isMuted ? 'Ligar Som' : 'Desligar Som');
-    this.audioBtn.textContent = isMuted ? '🔇' : '🔊';
+    this.updateAudioButtons(isMuted);
+  }
+
+  // 🎯 NOVO: Método para alternar áudio e atualizar todos os botões
+  toggleAudio() {
+    const isEnabled = this.audioEngine.enabled;
+    this.audioEngine.setMuted(isEnabled);
+    this.updateAudioButtons(isEnabled); // isEnabled = true significa que vai ficar muted
+  }
+
+  // 🎯 NOVO: Método para atualizar todos os botões de áudio
+  updateAudioButtons(isMuted) {
+    // Atualiza o botão principal (se existir)
+    if (this.audioBtn) {
+      this.audioBtn.textContent = isMuted ? '🔇' : '🔊';
+      this.audioBtn.setAttribute('aria-pressed', !isMuted);
+      this.audioBtn.setAttribute('data-tooltip', isMuted ? 'Ligar Som' : 'Desligar Som');
+    }
+
+    // Atualiza todos os botões minimalistas
+    this.audioControls?.forEach(btn => {
+      btn.textContent = isMuted ? '🔇' : '🔊';
+      btn.setAttribute('aria-pressed', !isMuted);
+      btn.title = isMuted ? 'Ativar áudio' : 'Desativar áudio';
+      
+      // Aplica classe visual para estado mutado
+      if (isMuted) {
+        btn.classList.add('muted');
+      } else {
+        btn.classList.remove('muted');
+      }
+    });
   }
 
   cacheDOMElements() {
@@ -57,9 +87,15 @@ export class UIController {
     this.patternSelect = document.getElementById('patternSelect');
     this.startPatternBtn = document.getElementById('startPatternBtn');
     this.stopBtn = document.getElementById('stopBtn');
-    this.patternName = document.getElementById('patternName');
-    this.phaseName = document.getElementById('phaseName');
-    this.patternTimer = document.getElementById('patternTimer');
+    
+    // 🎯 ATUALIZADO: Novos elementos para a interface simplificada
+    this.patternDescription = document.getElementById('patternDescription');
+    this.patternDescriptionContainer = document.querySelector('.pattern-description');
+    
+    // 🎯 REMOVIDO: Elementos antigos que não existem mais
+    // this.patternName = document.getElementById('patternName');
+    // this.phaseName = document.getElementById('phaseName');
+    // this.patternTimer = document.getElementById('patternTimer');
     
     this.protocolSelect = document.getElementById('protocolSelect');
     this.startProtocolBtn = document.getElementById('startProtocolBtn');
@@ -70,7 +106,9 @@ export class UIController {
     this.protocolTimer = document.getElementById('protocolTimer');
     this.nextPreview = document.getElementById('nextPreview');
     
-    this.audioBtn = document.getElementById('audioBtn');
+    // 🎯 NOVO: Busca todos os botões de áudio (tanto na área de padrões quanto protocolos)
+    this.audioBtn = document.getElementById('audioBtn'); // Botão principal (ainda usado)
+    this.audioControls = document.querySelectorAll('.audio-control'); // Novos botões minimalistas
     this.volSlider = document.getElementById('volSlider');
     this.themeBtn = document.getElementById('themeBtn');
     this.timerButtons = document.querySelectorAll('.timer-btn');
@@ -124,7 +162,8 @@ export class UIController {
     
     this.cancelProtocolBtn?.addEventListener('click', () => {
       this.protocolEngine.cancelProtocol();
-      this.showSection('protocols');
+      // Mantém na página de prática para escolher outro exercício
+      this.showPracticeTab('pattern');
     });
     
     this.skipStageBtn?.addEventListener('click', () => {
@@ -142,11 +181,14 @@ export class UIController {
     });
     
     this.audioBtn?.addEventListener('click', () => {
-      const isEnabled = this.audioEngine.enabled;
-      this.audioEngine.setMuted(isEnabled);
-      this.audioBtn.textContent = isEnabled ? '🔇' : '🔊';
-      this.audioBtn.setAttribute('aria-pressed', isEnabled);
-      this.audioBtn.setAttribute('data-tooltip', isEnabled ? 'Desligar Som' : 'Ligar Som');
+      this.toggleAudio();
+    });
+    
+    // 🎯 NOVO: Event listeners para todos os botões de áudio minimalistas
+    this.audioControls?.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.toggleAudio();
+      });
     });
     
     this.volSlider?.addEventListener('input', (e) => {
@@ -195,19 +237,43 @@ export class UIController {
   }
 
   updatePatternInfo(pattern) {
+    // 🎯 Método simplificado para a nova interface minimalista
+    // Em vez de mostrar informações dinâmicas, mostramos uma descrição clara e estática
+    this.updatePatternDescription(pattern);
+  }
+
+  // 🎯 NOVO: Método para atualizar a descrição do padrão selecionado
+  updatePatternDescription(pattern) {
+    if (!this.patternDescription || !this.patternDescriptionContainer) return;
+    
     if (pattern) {
-      this.patternName.textContent = pattern.name;
-      this.phaseName.textContent = 'Pronto';
-      if (this.selectedDuration > 0) {
-        this.patternTimer.textContent = `(${this.selectedDuration} min)`;
-      } else {
-        this.patternTimer.textContent = '(Contínuo)';
-      }
+      // Quando um padrão é selecionado, mostramos sua descrição
+      const duration = this.selectedDuration > 0 ? `${this.selectedDuration} min` : 'contínuo';
+      const description = this.getPatternDescription(pattern);
+      
+      this.patternDescription.textContent = `${pattern.name}: ${description} (${duration})`;
+      this.patternDescriptionContainer.classList.add('active');
     } else {
-      this.patternName.textContent = '';
-      this.phaseName.textContent = '';
-      this.patternTimer.textContent = '';
+      // Quando nenhum padrão está ativo, mostramos a mensagem padrão
+      this.patternDescription.textContent = 'Selecione um padrão de respiração para começar sua prática';
+      this.patternDescriptionContainer.classList.remove('active');
     }
+  }
+
+  // 🎯 NOVO: Método para obter descrição clara de cada padrão
+  getPatternDescription(pattern) {
+    const descriptions = {
+      'Sossega Leão': 'Relaxamento profundo com expiração prolongada',
+      'Box Plus': 'Equilíbrio e foco com ritmo simétrico', 
+      'Energia Calma': 'Ativação suave para começar o dia',
+      'Calma': 'Tranquilidade imediata com respiração simples',
+      'Endurance': 'Resistência respiratória e tolerância ao CO₂',
+      'Melhor Ventilação': 'Otimização da troca gasosa pulmonar',
+      'Tranquilidade': 'Paz mental com ritmo suave e natural',
+      'Tactical': 'Alerta calmo para situações de pressão'
+    };
+    
+    return descriptions[pattern.name] || 'Padrão personalizado de respiração';
   }
 
   showSection(sectionId) {
@@ -272,11 +338,21 @@ export class UIController {
         this.contentProtocol.style.display = 'none';
         this.tabPattern.classList.add('active');
         this.tabProtocol.classList.remove('active');
+        
+        // 🎯 NOVO: Restaura o estilo de animação escolhido pelo usuário para padrões individuais
+        const activeStyleBtn = document.querySelector('.style-btn.active');
+        if (activeStyleBtn) {
+          const userSelectedStyle = activeStyleBtn.dataset.style;
+          this.animationEngine.setAnimationStyle(userSelectedStyle);
+        }
       } else {
         this.contentPattern.style.display = 'none';
         this.contentProtocol.style.display = 'block';
         this.tabPattern.classList.remove('active');
         this.tabProtocol.classList.add('active');
+        
+        // 🎯 NOVO: Força animação Legacy para protocolos
+        this.animationEngine.setAnimationStyle('Legacy');
       }
       
       this._restoreCurrentState();
@@ -299,24 +375,64 @@ export class UIController {
     const isFinished = state === ProtocolStates.FINISHED;
     const isPreparing = state === ProtocolStates.PREPARING;
     const isRunning = state === ProtocolStates.RUNNING;
+    const isTransition = state === ProtocolStates.TRANSITION;
 
     this.startProtocolBtn.disabled = !isPreparing;
-    this.cancelProtocolBtn.disabled = isPreparing || isFinished || !isRunning;
+    this.cancelProtocolBtn.disabled = isPreparing || isFinished;
     if (this.skipStageBtn) this.skipStageBtn.disabled = !isRunning;
     
     if (isFinished) {
-      this.stageStatus.textContent = 'Protocolo Concluído!';
-      this.protocolTimer.textContent = 'Retornando em 3 segundos...';
+      this.stageStatus.innerHTML = `
+        <div class="protocol-completed">
+          <h3>🎉 Protocolo Concluído!</h3>
+          <p>Seu sistema nervoso foi otimizado com sucesso. Observe as sensações de equilíbrio e clareza.</p>
+        </div>
+      `;
+      this.protocolTimer.textContent = 'Protocolo finalizado com sucesso';
       this.nextPreview.textContent = '';
       this.protocolProgress.value = this.protocolProgress.max;
-      setTimeout(() => this.showSection('protocols'), 3000);
       return;
     }
 
     if (currentProtocol && currentStageIndex !== undefined) {
       const stage = currentProtocol.stages[currentStageIndex];
-      this.stageStatus.textContent = `Estágio ${currentStageIndex + 1}/${currentProtocol.stages.length}: ${stage.pattern.name}`;
       
+      // 🎯 NOVA FUNCIONALIDADE: Busca o texto guia para o estágio atual
+      const stageGuide = getStageGuide(currentProtocol.id, currentStageIndex);
+      
+      if (isTransition) {
+        this.stageStatus.innerHTML = `
+          <div class="transition-state">
+            <h3>⚡ Transição Neuroplástica</h3>
+            <p>Seu sistema nervoso está se adaptando. Observe as mudanças sutis nas sensações corporais.</p>
+          </div>
+        `;
+        
+        const nextStage = currentProtocol.stages[currentStageIndex + 1];
+        if (nextStage) {
+          const nextGuide = getStageGuide(currentProtocol.id, currentStageIndex + 1);
+          this.nextPreview.innerHTML = nextGuide ? 
+            `<strong>A seguir:</strong> ${nextGuide.title} - ${nextGuide.subtitle}` :
+            `A seguir: ${nextStage.pattern.name}`;
+        }
+      } else if (isRunning && stageGuide) {
+        // 🎯 NOVA FUNCIONALIDADE: Mostra o texto guia científico
+        this.stageStatus.innerHTML = `
+          <div class="stage-guide">
+            <div class="stage-header">
+              <span class="stage-number">Estágio ${currentStageIndex + 1}/${currentProtocol.stages.length}</span>
+              <h3 class="stage-title">${stageGuide.title}</h3>
+              <p class="stage-subtitle">${stageGuide.subtitle}</p>
+            </div>
+            <p class="stage-description">${stageGuide.description}</p>
+          </div>
+        `;
+      } else {
+        // Fallback para quando não há guia disponível
+        this.stageStatus.textContent = `Estágio ${currentStageIndex + 1}/${currentProtocol.stages.length}: ${stage.pattern.name}`;
+      }
+      
+      // Timer e progresso permanecem iguais
       if (progress.totalProtocolTime && progress.totalElapsed !== undefined) {
         const totalSec = progress.totalProtocolTime;
         const elapsedSec = progress.totalElapsed;
@@ -327,30 +443,42 @@ export class UIController {
 
         this.protocolProgress.value = elapsedSec;
         this.protocolProgress.max = totalSec;
-
-        // --- ATUALIZAÇÃO DE ACESSIBILIDADE ---
+        
+        // Acessibilidade
         this.protocolProgress.setAttribute('aria-valuenow', elapsedSec.toFixed(0));
         this.protocolProgress.setAttribute('aria-valuemax', totalSec.toFixed(0));
         const percent = totalSec > 0 ? Math.round((elapsedSec / totalSec) * 100) : 0;
         this.protocolProgress.setAttribute('aria-valuetext', `${percent}% concluído`);
-        // --- FIM DA ATUALIZAÇÃO ---
       }
       
-      if (state === ProtocolStates.TRANSITION) {
-        this.stageStatus.textContent = "Transição...";
-        const nextStage = currentProtocol.stages[currentStageIndex + 1];
-        if (nextStage) {
-          this.nextPreview.textContent = `A seguir: ${nextStage.pattern.name}`;
-        }
-      } else {
+      // Limpa preview se não estiver em transição
+      if (!isTransition) {
         this.nextPreview.textContent = '';
       }
+      
     } else if (isPreparing) {
+      if (this.protocolSelect.selectedIndex >= 0) {
         const selectedProtocol = protocols[this.protocolSelect.selectedIndex];
-        this.stageStatus.textContent = `Pronto para iniciar: ${selectedProtocol.name}`;
+        this.stageStatus.innerHTML = `
+          <div class="protocol-ready">
+            <h3>🧘 Pronto para Começar</h3>
+            <p><strong>${selectedProtocol.name}</strong></p>
+            <p class="protocol-intention">Prepare-se para uma jornada neurofisiológica guiada de transformação consciente.</p>
+          </div>
+        `;
         this.protocolTimer.textContent = `Duração total: ${selectedProtocol.totalDurationMinutes} min`;
-        this.protocolProgress.value = 0;
-        this.protocolProgress.setAttribute('aria-valuenow', '0');
+      } else {
+        this.stageStatus.textContent = 'Selecione um protocolo';
+        this.protocolTimer.textContent = '';
+      }
+      this.protocolProgress.value = 0;
+      this.protocolProgress.setAttribute('aria-valuenow', '0');
+    } else {
+      // Estado IDLE - limpa as informações
+      this.stageStatus.textContent = '';
+      this.protocolTimer.textContent = '';
+      this.nextPreview.textContent = '';
+      this.protocolProgress.value = 0;
     }
   }
 }
