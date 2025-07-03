@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Três Estilos de Animação</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .animations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .animation-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn.active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .description {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            opacity: 0.9;
+            margin-top: 15px;
+        }
+
+        .box-special {
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .box-special .card-title {
+            color: #4CAF50;
+        }
+
+        .box-special .card-title::after {
+            content: " ✨";
+        }
+
+        @media (max-width: 768px) {
+            .animations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            canvas {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌬️ Três Estilos de Animação</h1>
+        
+        <div class="animations-grid">
+            <!-- Ring Animation -->
+            <div class="animation-card">
+                <div class="card-title">Ring (Anel)</div>
+                <div class="canvas-container">
+                    <canvas id="ringCanvas" width="350" height="350"></canvas>
+                </div>
+                <div class="controls">
+                    <button class="btn active" onclick="setPhase('ring', 'INHALE')">In</button>
+                    <button class="btn" onclick="setPhase('ring', 'HOLD_IN')">Hold</button>
+                    <button class="btn" onclick="setPhase('ring', 'EXHALE')">Out</button>
+                    <button class="btn" onclick="setPhase('ring', 'HOLD_OUT')">Wait</button>
+                </div>
+                <div class="description">
+                    Anel tracejado que se desenha progressivamente. Ideal para práticas de respiração focada.
+                </div>
+            </div>
+
+            <!-- Bordered Animation -->
+            <div class="animation-card">
+                <div class="card-title">Bordered (Bordas)</div>
+                <div class="canvas-container">
+                    <canvas id="borderedCanvas" width="350" height="350"></canvas>
+                </div>
+                <div class="controls">
+                    <button class="btn active" onclick="setPhase('bordered', 'INHALE')">In</button>
+                    <button class="btn" onclick="setPhase('bordered', 'HOLD_IN')">Hold</button>
+                    <button class="btn" onclick="setPhase('bordered', 'EXHALE')">Out</button>
+                    <button class="btn" onclick="setPhase('bordered', 'HOLD_OUT')">Wait</button>
+                </div>
+                <div class="description">
+                    Três anéis concêntricos que expandem e contraem em unísono. Perfeito para meditação profunda.
+                </div>
+            </div>
+
+            <!-- Box Animation -->
+            <div class="animation-card box-special">
+                <div class="card-title">Box (Caixa)</div>
+                <div class="canvas-container">
+                    <canvas id="boxCanvas" width="350" height="350"></canvas>
+                </div>
+                <div class="controls">
+                    <button class="btn active" onclick="setPhase('box', 'INHALE')">In</button>
+                    <button class="btn" onclick="setPhase('box', 'HOLD_IN')">Hold</button>
+                    <button class="btn" onclick="setPhase('box', 'EXHALE')">Out</button>
+                    <button class="btn" onclick="setPhase('box', 'HOLD_OUT')">Wait</button>
+                </div>
+                <div class="description">
+                    <strong>Exclusivo para Box Breathing!</strong> Bolinha percorre o perímetro de uma caixa, onde cada lado representa uma fase da respiração.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PHASE_TYPES = {
+            INHALE: 'INHALE',
+            HOLD_IN: 'HOLD_IN',
+            EXHALE: 'EXHALE',
+            HOLD_OUT: 'HOLD_OUT'
+        };
+
+        const phaseColors = {
+            [PHASE_TYPES.INHALE]: '#4CAF50',
+            [PHASE_TYPES.HOLD_IN]: '#2196F3',
+            [PHASE_TYPES.EXHALE]: '#FF9800',
+            [PHASE_TYPES.HOLD_OUT]: '#9C27B0'
+        };
+
+        let currentPhases = {
+            ring: PHASE_TYPES.INHALE,
+            bordered: PHASE_TYPES.INHALE,
+            box: PHASE_TYPES.INHALE
+        };
+
+        let animationTime = 0;
+
+        function lightenColor(color, factor) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * factor * 100);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(x, y, width, height, radius);
+            } else {
+                ctx.moveTo(x + radius, y);
+                ctx.lineTo(x + width - radius, y);
+                ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                ctx.lineTo(x + width, y + height - radius);
+                ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                ctx.lineTo(x + radius, y + height);
+                ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                ctx.lineTo(x, y + radius);
+                ctx.quadraticCurveTo(x, y, x + radius, y);
+            }
+        }
+
+        function drawRingAnimation(canvas, phase, time) {
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 120;
+            const circumference = 2 * Math.PI * radius;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let progress = 0.5 + 0.5 * Math.sin(time * 0.002);
+            if (phase === PHASE_TYPES.HOLD_IN) progress = 1.0;
+            if (phase === PHASE_TYPES.HOLD_OUT) progress = 0.05;
+            
+            const dashLength = circumference * (0.05 + 0.95 * progress);
+            const gradient = ctx.createLinearGradient(
+                centerX - radius, centerY - radius,
+                centerX + radius, centerY + radius
+            );
+            const baseColor = phaseColors[phase];
+            gradient.addColorStop(0, baseColor);
+            gradient.addColorStop(0.5, lightenColor(baseColor, 0.2));
+            gradient.addColorStop(1, baseColor);
+            
+            ctx.save();
+            ctx.shadowColor = baseColor;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.setLineDash([dashLength, circumference - dashLength]);
+            ctx.lineDashOffset = -circumference * 0.25;
+            ctx.stroke();
+            ctx.restore();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(getPhaseShortName(phase), centerX, centerY);
+        }
+
+        function drawBorderedAnimation(canvas, phase, time) {
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const baseRadius = 60;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let scale = 0.5 + 0.5 * Math.sin(time * 0.002);
+            if (phase === PHASE_TYPES.HOLD_IN) scale = 1.0;
+            if (phase === PHASE_TYPES.HOLD_OUT) scale = 0.3;
+            
+            const baseColor = phaseColors[phase];
+            for (let i = 0; i < 3; i++) {
+                const ringRadius = (baseRadius + i * 12) * scale;
+                const alpha = 1.0 - (i * 0.25);
+                
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = baseColor;
+                ctx.lineWidth = 2;
+                ctx.shadowColor = baseColor;
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, ringRadius, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.restore();
+            }
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(getPhaseShortName(phase), centerX, centerY);
+        }
+
+        function drawBoxAnimation(canvas, phase, time) {
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const boxSize = 160;
+            const halfSize = boxSize / 2;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const left = centerX - halfSize;
+            const right = centerX + halfSize;
+            const top = centerY - halfSize;
+            const bottom = centerY + halfSize;
+            
+            const baseColor = phaseColors[phase];
+            
+            // Desenha a caixa
+            ctx.strokeStyle = baseColor;
+            ctx.lineWidth = 3;
+            ctx.shadowColor = baseColor;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            roundRect(ctx, left, top, boxSize, boxSize, 10);
+            ctx.stroke();
+            
+            // Calcula posição da bolinha baseada na fase
+            let progress = (0.5 + 0.5 * Math.sin(time * 0.003)) % 1;
+            let ballPos = calculateBallPosition(phase, progress, left, right, top, bottom);
+            
+            // Desenha a bolinha
+            ctx.save();
+            ctx.fillStyle = baseColor;
+            ctx.shadowColor = baseColor;
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(ballPos.x, ballPos.y, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+            
+            // Texto central
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(getPhaseShortName(phase), centerX, centerY);
+        }
+
+        function calculateBallPosition(phase, progress, left, right, top, bottom) {
+            switch (phase) {
+                case PHASE_TYPES.INHALE:
+                    return { x: left + (right - left) * progress, y: bottom };
+                case PHASE_TYPES.HOLD_IN:
+                    return { x: right, y: bottom - (bottom - top) * progress };
+                case PHASE_TYPES.EXHALE:
+                    return { x: right - (right - left) * progress, y: top };
+                case PHASE_TYPES.HOLD_OUT:
+                    return { x: left, y: top + (bottom - top) * progress };
+                default:
+                    return { x: left, y: bottom };
+            }
+        }
+
+        function getPhaseShortName(phase) {
+            const names = {
+                [PHASE_TYPES.INHALE]: 'In',
+                [PHASE_TYPES.HOLD_IN]: 'Hold',
+                [PHASE_TYPES.EXHALE]: 'Out',
+                [PHASE_TYPES.HOLD_OUT]: 'Hold'
+            };
+            return names[phase] || '';
+        }
+
+        function setPhase(animationType, phase) {
+            currentPhases[animationType] = phase;
+            
+            // Atualiza botões ativos
+            const cardIndex = animationType === 'ring' ? 0 : animationType === 'bordered' ? 1 : 2;
+            const buttons = document.querySelectorAll('.animation-card')[cardIndex].querySelectorAll('.btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function animate() {
+            animationTime = performance.now();
+            
+            drawRingAnimation(document.getElementById('ringCanvas'), currentPhases.ring, animationTime);
+            drawBorderedAnimation(document.getElementById('borderedCanvas'), currentPhases.bordered, animationTime);
+            drawBoxAnimation(document.getElementById('boxCanvas'), currentPhases.box, animationTime);
+            
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('load', () => {
+            animate();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+/* themes.css - Sistema de temas e variáveis de cor */
+
+:root {
+    --color-inhale: #4a90e2;
+    --color-hold-in: #9b59b6;
+    --color-exhale: #1abc9c;
+    --color-hold-out: #e74c3c;
+    --text-secondary: #666;
+}
+
+body.dark-theme {
+    --primary-color: #5a9de2;
+    --secondary-color: #8b78ee;
+    --accent-color: #58e1dc;
+    --text-dark: #ecf0f1;
+    --text-light: #2c3e50;
+    --text-secondary: #bdc3c7;
+    --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    
+    background: #1a1a1a;
+    color: #ecf0f1;
+}
+
+body.dark-theme header {
+    background: rgba(30, 30, 30, 0.95);
+}
+
+body.dark-theme .nav-item:hover {
+    background: var(--primary-color);
+    color: #1a1a1a;
+}
+
+body.dark-theme .insight-card,
+body.dark-theme .protocol-container,
+body.dark-theme .pattern-area,
+body.dark-theme .protocol-area {
+    background: #2c3e50;
+    color: #ecf0f1;
+}
+
+body.dark-theme .protocol-tab {
+    background: #34495e;
+    color: #ecf0f1;
+}
+
+body.dark-theme .protocol-tab:hover {
+    border-color: var(--primary-color);
+}
+
+body.dark-theme .breath-flow {
+    background: #34495e;
+}
+
+body.dark-theme select,
+body.dark-theme button {
+    background: #34495e;
+    color: #ecf0f1;
+    border: 1px solid #4a5f7a;
+}
+
+body.dark-theme #volSlider {
+    background: #34495e;
+}
+
+/* Estilos para as práticas */
+.practice-tab {
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    background: white;
+    border-radius: 25px;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.practice-tab.active {
+    background: var(--bg-gradient);
+    color: white;
+}
+
+.practice-tabs {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+body.dark-theme .practice-tab {
+    background: #34495e;
+    color: #ecf0f1;
+}
+
+/* Estilos para a seção de padrões no tema dark */
+body.dark-theme .patterns-overview {
+    background: rgba(44, 62, 80, 0.5) !important;
+}
+
+body.dark-theme .pattern-mini {
+    background: #34495e !important;
+    color: #ecf0f1 !important;
+}
+
+body.dark-theme .pattern-mini:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+}
+
+body.dark-theme .pattern-code {
+    color: var(--primary-color) !important;
+}
+
+body.dark-theme .pattern-name {
+    color: #ecf0f1 !important;
+}
+
+body.dark-theme .pattern-mini:hover .pattern-code,
+body.dark-theme .pattern-mini:hover .pattern-name {
+    color: white !important;
+}
+
+body.dark-theme .pattern-explanation {
+    background: #2c3e50 !important;
+    color: #ecf0f1 !important;
+}

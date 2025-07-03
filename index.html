@@ -1,167 +1,1320 @@
 <!DOCTYPE html>
-<html lang="pt-br" data-theme="light">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Box Breathing - Respiração Quadrada</title>
-        <link rel="stylesheet" href="style.css">
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>Box Breathing</h1>
-                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema">
-                    <!-- Ícone Sol (Tema Claro) -->
-                    <svg class="sun-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm4.5 5.5a1 1 0 0 1 0 1.42l-.71.71a1 1 0 0 1-1.42-1.42l.71-.71a1 1 0 0 1 1.42 0zm-9 0a1 1 0 0 1 1.42 0l.71.71a1 1 0 0 1-1.42 1.42l-.71-.71a1 1 0 0 1 0-1.42zM12 20a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm-4.5-5.5a1 1 0 0 1 0-1.42l.71-.71a1 1 0 0 1 1.42 1.42l-.71-.71a1 1 0 0 1-1.42 0zm9 0a1 1 0 0 1-1.42 0l-.71-.71a1 1 0 0 1 1.42-1.42l.71.71a1 1 0 0 1 0 1.42zM4 12a1 1 0 0 1-1-1 1 1 0 0 1 1-1h1a1 1 0 0 1 0 2H4zm17-1a1 1 0 0 1-1 1h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1zM12 6.5a5.5 5.5 0 1 0 5.5 5.5 5.51 5.51 0 0 0-5.5-5.5z"/>
-                    </svg>
-                    <!-- Ícone Lua (Tema Escuro) -->
-                    <svg class="moon-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M12.3 4.9c.4-.2.6-.7.5-1.1s-.6-.8-1.1-.8C6.8 3.1 3 7.1 3 12c0 5 4 9 9 9 3.8 0 7.1-2.4 8.4-5.9.2-.4 0-.9-.4-1.2-.4-.3-.9-.2-1.2.1-1 .9-2.3 1.4-3.7 1.4-3.1 0-5.7-2.5-5.7-5.7 0-1.9 1.1-3.8 2.9-4.8z"/>
-                    </svg>
-                </button>
-                <button id="mute-btn" class="mute-toggle" aria-label="Alternar áudio">Som: On</button>
-            </div>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breathwork Explorer - Portal de Protocolos Respiratórios Avançados</title>
 
-            <!-- Configuração -->
-            <div class="config">
-                <!-- Seleção de Técnica - OCULTO mas presente -->
-                <div class="config-item" style="display: none;">
-                    <label for="technique-select">Técnica:</label>
-                    <select id="technique-select" class="control">
-                        <option value="box" selected>Box Breathing</option>
-                        <option value="alternate">Alternate Nostril Breathing</option>
-                        <option value="diaphragmatic">Diaphragmatic Breathing</option>
-                        <option value="478">4-7-8 Breathing</option>
-                    </select>
-                </div>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/themes.css" />
+    <link rel="stylesheet" href="css/animations.css" />
 
-                <!-- Seleção de Padrão de Respiração -->
-                <div class="config-item">
-                    <label for="pattern-select">Padrão:</label>
-                    <select id="pattern-select" class="control">
-                        <option value="4" selected>4-4-4-4</option>
-                        <option value="5">5-5-5-5</option>
-                        <option value="6">6-6-6-6</option>
-                    </select>
-                </div>
+    <style>
+        /* Variáveis de design para criar um sistema visual coerente */
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #7b68ee;
+            --accent-color: #48d1cc;
+            --text-dark: #2c3e50;
+            --text-light: #ecf0f1;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-                <!-- Seleção de Tempo Total -->
-                <div class="config-item">
-                    <label for="duration-select">Duração:</label>
-                    <select id="duration-select">
-                        <option value="300">5 minutos</option>
-                        <option value="600" selected>10 minutos</option>
-                        <option value="900">15 minutos</option>
-                    </select>
-                </div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-                <!-- Botão Iniciar centralizado -->
-                <div class="config-item-full">
-                    <button id="start-btn">Iniciar</button>
-                </div>
-            </div>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-            <!-- Contagem regressiva -->
-            <div id="countdown" class="hidden">
-                Prepare-se: <span id="countdown-number">3</span>
-            </div>
+        /* Header com navegação fixa e elegante */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: var(--transition-smooth);
+        }
 
-            <!-- Área principal da animação -->
-            <div id="animation-container">
-                <!-- Container específico para a animação -->
-                <div id="box-container">
-                <div id="breathing-box"></div>
-                <div id="progress-indicator"></div>
-                <!-- Contador de Fase -->
-                <div id="phase-countdown"></div>
-                </div>
-                <div id="instruction">Pronto para começar?</div>
-                <div id="timer">10:00</div>
-                
-                <!-- Barra de progresso total -->
-                <div class="progress-container">
-                    <div class="progress-bar" id="progress-bar">0%</div>
-                    <div class="phase-markers">
-                        <div class="phase-marker" data-phase="inhale">
-                            <div class="marker-fill"></div>
-                            <span class="marker-label">Inspira</span>
-                        </div>
-                        <div class="phase-marker" data-phase="hold-in">
-                            <div class="marker-fill"></div>
-                            <span class="marker-label">Segura</span>
-                        </div>
-                        <div class="phase-marker" data-phase="exhale">
-                            <div class="marker-fill"></div>
-                            <span class="marker-label">Expira</span>
-                        </div>
-                        <div class="phase-marker" data-phase="hold-out">
-                            <div class="marker-fill"></div>
-                            <span class="marker-label">Segura</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #themeBtn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 1.2rem;
+            margin-left: 1rem;
+            flex-shrink: 0;
+        }
+
+        #themeBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            transition: var(--transition-smooth);
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            background: var(--bg-gradient);
+            color: white;
+        }
+
+        /* Hero section com animação de respiração */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breathing-circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            position: absolute;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.1; }
+        }
+
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Call to action para o futuro app de prática */
+        .cta-practice {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-top: 3rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-practice h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .practice-preview {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .practice-feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        /* Seções de conteúdo */
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Cards para insights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .insight-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--bg-gradient);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .insight-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .insight-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Sistema de tabs para organizar os 7 protocolos */
+        .protocol-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .protocol-tab {
+            background: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            white-space: nowrap;
+            border: 2px solid transparent;
+        }
+
+        .protocol-tab:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .protocol-tab.active {
+            background: var(--bg-gradient);
+            color: white;
+        }
+
+        /* Protocolos com visualização */
+        .protocol-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition-smooth);
+            display: none;
+        }
+
+        .protocol-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .protocol-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .protocol-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .protocol-purpose {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+
+        .protocol-id {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Visualização do fluxo respiratório */
+        .breath-flow {
+            width: 100%;
+            height: 200px;
+            margin: 2rem 0;
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .flow-phase {
+            position: absolute;
+            bottom: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: var(--transition-smooth);
+        }
+
+        .phase-inhale {
+            background: #3498db;
+            left: 0;
+        }
+
+        .phase-hold-full {
+            background: #9b59b6;
+        }
+
+        .phase-exhale {
+            background: #1abc9c;
+        }
+
+        .phase-hold-empty {
+            background: #e74c3c;
+        }
+
+        /* Timeline dos protocolos */
+        .protocol-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            position: relative;
+        }
+
+        .timeline-phase {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .timeline-phase::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #ccc;
+        }
+
+        .timeline-phase:last-child::after {
+            display: none;
+        }
+
+        .phase-duration {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .phase-description {
+            margin-top: 0.5rem;
+            color: #666;
+        }
+
+        /* Botões interativos */
+        .btn {
+            background: var(--bg-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-block;
+            text-decoration: none;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-practice {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 1.1rem;
+            padding: 1.2rem 2.5rem;
+        }
+
+        /* Animação do círculo respiratório para demonstração */
+        .demo-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: var(--bg-gradient);
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            animation: demoBreath 4s ease-in-out infinite;
+        }
+
+        @keyframes demoBreath {
+            0%, 100% { transform: scale(0.8); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Timer de seleção */
+        .timer-selection {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
         
-            <!-- Área de instruções -->
-            <div id="instructions">        
-                <!-- Botão de Parar (aparece durante o exercício) -->
-                <div class="stop-button-container">
-                    <button id="stop-btn" class="hidden">Parar</button>
-                </div>
+        .timer-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        
+        .timer-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .timer-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Alinhamento da seção de prática */
+        #practice {
+            padding: 2rem;
+        }
+        
+        #practice .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .practice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .practice-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+        
+        #backToHubBtn {
+            display: none;
+        }
+        
+        .practice-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .practice-tab {
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        
+        .practice-tab:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .practice-tab.active {
+            background: var(--bg-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .pattern-info {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .pattern-info span:not(:empty)::after {
+            content: " • ";
+            margin: 0 0.5rem;
+        }
+        
+        .pattern-info span:last-child::after {
+            content: "";
+        }
+        
+        /* Melhorias para os botões de prática de padrões */
+        .pattern-mini {
+            cursor: pointer;
+        }
+        
+        .pattern-mini:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .pattern-mini:hover .pattern-code,
+        .pattern-mini:hover .pattern-name {
+            color: white;
+        }
 
-                <!-- Seção Saiba Mais -->
-                <div id="saiba-mais" class="saiba-mais">
-                    <div class="saiba-mais-header">
-                        <span class="info-icon">ⓘ</span>
-                        <span>Sobre Box Breathing</span>
-                        <span class="expand-icon">▼</span>
-                    </div>
-                    <div class="saiba-mais-content">
-                        <h3>A Técnica dos Navy SEALs</h3>
-                        <p>O <strong>Box Breathing</strong> (Respiração Quadrada) é uma técnica poderosa utilizada pelos Navy SEALs, as forças especiais da Marinha dos EUA. Foi popularizada pelo Comandante Mark Divine, ex-Navy SEAL e autor de "The Way of the SEAL".</p>
-                        
-                        <h4>Como funciona:</h4>
-                        <p>A técnica segue um padrão quadrado simples, onde cada fase tem a mesma duração:</p>
-                        <ul>
-                            <li><strong>Inspire</strong> pela contagem escolhida (4, 5 ou 6)</li>
-                            <li><strong>Segure</strong> o ar pela mesma contagem</li>
-                            <li><strong>Expire</strong> pela mesma contagem</li>
-                            <li><strong>Segure</strong> vazio pela mesma contagem</li>
-                        </ul>
-                        
-                        <h4>Benefícios comprovados:</h4>
-                        <ul>
-                            <li><strong>Controle Mental:</strong> Ajuda no controle da atenção e gestão do estado emocional</li>
-                            <li><strong>Foco Aprimorado:</strong> Fortalece a concentração e clareza mental</li>
-                            <li><strong>Redução do Estresse:</strong> Ativa o sistema nervoso parassimpático, promovendo calma</li>
-                            <li><strong>Preparação Mental:</strong> Ideal antes de situações desafiadoras ou estressantes</li>
-                            <li><strong>Recuperação:</strong> Excelente para recuperação após atividades intensas</li>
-                        </ul>
-                        
-                        <p class="quote">"Uma arma secreta que me dava vantagem sobre outros SEALs" - Comandante Mark Divine</p>
-                    </div>
-                </div>
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            
+            .nav-item {
+                margin: 0.25rem;
+                font-size: 0.9rem;
+            }
 
-                <!-- Controles avançados OCULTOS -->
-                <div class="advanced-controls hidden" id="advanced-controls">
-                    <div class="control-group" data-technique="box">
-                        <h3>Duração de cada fase (Box Breathing)</h3>
-                        <div>
-                            <label for="phase-duration">Duração (segundos):</label>
-                            <input type="range" id="phase-duration" min="2" max="8" value="4" step="1">
-                            <span id="phase-duration-value">4</span> segundos
-                        </div>
-                        <p class="help-text">Ajusta as 4 fases do Box Breathing.</p>
-                    </div>
+            #themeBtn {
+                order: 1;
+                margin: 0.5rem;
+                font-size: 1rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            .protocol-tabs {
+                justify-content: flex-start;
+            }
+            
+            .timer-selection {
+                flex-wrap: wrap;
+            }
+            
+            .practice-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .audio-controls {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+        }
+
+        /* Indicadores visuais dos benefícios */
+        .benefits-list {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .benefits-list li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .benefits-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Grid para overview dos padrões */
+        .patterns-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+        }
+
+        .pattern-mini {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .pattern-mini:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .pattern-code {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .pattern-name {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            color: #666;
+        }
+
+        .pattern-explanation {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 3rem;
+        }
+
+        .pattern-explanation {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 3rem;
+        }
+
+        /* Estilos para o App de Prática */
+        .practice-app-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5rem 2rem;
+            background: #f5f7fa;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .animation-area {
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 2rem;
+        }
+
+        #breath-circle {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .pattern-area, .protocol-area {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .pattern-row, .protocol-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select, button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .pattern-info {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .global-controls {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+            padding: 0.5rem;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #audioBtn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            flex-shrink: 0;
+        }
+
+        #audioBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Estilos para acessibilidade */
+        .protocol-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        progress {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            appearance: none;
+        }
+
+        progress::-webkit-progress-bar {
+            background: #f3f3f3;
+        }
+
+        progress::-webkit-progress-value {
+            background: var(--primary-color);
+        }
+
+        progress::-moz-progress-bar {
+            background: var(--primary-color);
+        }
+
+        /* Animações de entrada para o app de prática */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .practice-app-container > * {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header com navegação -->
+    <header>
+        <nav>
+            <div class="nav-item active" onclick="PranaHub.showSection('home')">Início</div>
+            <div class="nav-item" onclick="PranaHub.showSection('insights')">Insights</div>
+            <div class="nav-item" onclick="PranaHub.showSection('protocols')">Protocolos</div>
+            <div class="nav-item" onclick="PranaHub.showSection('science')">Ciência</div>
+            <div class="nav-item" onclick="PranaHub.showSection('patterns')">Padrões</div>
+            <div class="nav-item" onclick="PranaHub.showSection('practice')">Praticar</div>
+            
+            <button id="themeBtn" title="Alternar tema" aria-label="Alternar tema claro/escuro">🌙/☀️</button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero" id="home">
+        <div class="breathing-circle"></div>
+        <div class="breathing-circle" style="animation-delay: 1s;"></div>
+        <div class="breathing-circle" style="animation-delay: 2s;"></div>
+        <div class="hero-content">
+            <h1>Breathwork Explorer</h1>
+            <p>Desbloqueie o poder da respiração consciente através de protocolos cientificamente validados e sabedoria milenar</p>
+            <button class="btn" onclick="PranaHub.showSection('protocols')">Explorar Protocolos</button>
+        </div>
+    </div>
+
+    <!-- Seção de Insights -->
+    <section class="section" id="insights">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem;">Insights Fundamentais</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; color: #666;">
+            Descubra os princípios que tornam o breathwork uma ferramenta poderosa para transformação física e mental
+        </p>
+        
+        <div class="insights-grid">
+            <div class="insight-card">
+                <h3>Engenharia Neural da Respiração</h3>
+                <p>Cada fase respiratória ativa diferentes ramos do sistema nervoso autônomo. A inspiração favorece ligeira dominância simpática, enquanto a expiração intensifica a ação do nervo vago, promovendo relaxamento profundo.</p>
+                <ul class="benefits-list">
+                    <li>Controle direto sobre estados de consciência</li>
+                    <li>Modulação da resposta ao estresse</li>
+                    <li>Otimização da variabilidade cardíaca</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <h3>Princípio da Ressonância Cardiovascular</h3>
+                <p>Respirações entre 5-6 ciclos por minuto criam coerência cardíaca, um estado onde coração, mente e emoções operam em harmonia sinérgica. Este ritmo otimiza a eficiência fisiológica e clareza mental.</p>
+                <ul class="benefits-list">
+                    <li>Melhora do foco e tomada de decisão</li>
+                    <li>Redução de 23% nos níveis de cortisol</li>
+                    <li>Aumento da criatividade e intuição</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <h3>Memória Respiratória e Neuroplasticidade</h3>
+                <p>O sistema nervoso mantém uma "impressão" de padrões respiratórios por 3-5 minutos após a prática. Sequências bem projetadas criam efeitos cumulativos que remodelam circuitos neurais permanentemente.</p>
+                <ul class="benefits-list">
+                    <li>Adaptações duradouras no sistema nervoso</li>
+                    <li>Maior resiliência ao estresse</li>
+                    <li>Expansão da capacidade pulmonar</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <h3>Proporções Áureas da Respiração</h3>
+                <p>Diferentes proporções entre fases respiratórias produzem estados específicos. A proporção 1:2 (inspiração:expiração) ativa fortemente o sistema parassimpático, enquanto 2:1 energiza através de dominância simpática controlada.</p>
+                <ul class="benefits-list">
+                    <li>Personalização precisa de estados mentais</li>
+                    <li>Transições suaves entre energia e calma</li>
+                    <li>Controle fino sobre neurotransmissores</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <h3>Janelas de Plasticidade Aumentada</h3>
+                <p>A transição estratégica entre padrões cria momentos de hipersensibilidade neural onde o sistema está maximamente receptivo a mudanças. Como afinar um instrumento - primeiro tensionar, depois relaxar.</p>
+                <ul class="benefits-list">
+                    <li>Potencialização de efeitos adaptativos</li>
+                    <li>Quebra de padrões respiratórios disfuncionais</li>
+                    <li>Aceleração de processos de cura</li>
+                </ul>
+            </div>
+            
+            <div class="insight-card">
+                <h3>Quimiorreceptores e Estados Alterados</h3>
+                <p>Retenções estratégicas modulam níveis de CO2 e O2, ativando quimiorreceptores que influenciam estados de consciência. A hipercapnia controlada pode induzir estados meditativos profundos.</p>
+                <ul class="benefits-list">
+                    <li>Acesso a estados não-ordinários de consciência</li>
+                    <li>Aumento da tolerância ao desconforto</li>
+                    <li>Ativação de mecanismos de autocura</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Protocolos -->
+    <section class="section" id="protocols">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem;">7 Protocolos Integrados</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; color: #666;">
+            Sequências cientificamente otimizadas para objetivos específicos do seu cotidiano. Cada protocolo combina múltiplos padrões respiratórios em progressões estratégicas.
+        </p>
+
+        <!-- Tabs para navegar entre protocolos -->
+        <div class="protocol-tabs">
+            <div class="protocol-tab active" onclick="PranaHub.showProtocol('p1')">P1 - Manhã</div>
+            <div class="protocol-tab" onclick="PranaHub.showProtocol('p2')">P2 - Foco</div>
+            <div class="protocol-tab" onclick="PranaHub.showProtocol('p3')">P3 - Meditação</div>
+            <div class="protocol-tab" onclick="PranaHub.showProtocol('p4')">P4 - Reset Mental</div>
+            <div class="protocol-tab" onclick="PranaHub.showProtocol('p5')">P5 - Pré-Exercício</div>
+            <div class="protocol-tab" onclick="PranaHub.showProtocol('p6')">P6 - Recuperação</div>
+            <div class="protocol-tab" onclick="PranaHub.showProtocol('p7')">P7 - Gaming</div>
+        </div>
+
+        <!-- P1 - Ativação Matinal -->
+        <div class="protocol-container active" id="p1">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P1</span>
+                    <h3 class="protocol-title">Ignição Progressiva</h3>
                 </div>
+                <span class="protocol-purpose">Ativação Matinal</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">Este protocolo de 12 minutos desperta o sistema nervoso de forma gradual e sustentável. Inicia com 3 minutos de observação da respiração natural para estabelecer consciência, seguido por três fases que progressivamente aumentam energia e clareza mental.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">4 min</div>
+                    <div class="phase-name" style="color: #3498db; font-weight: bold;">Melhor Ventilação</div>
+                    <div class="phase-description">3-0-8-1.8</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #e74c3c; font-weight: bold;">Energia Calma</div>
+                    <div class="phase-description">5-0-2-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">3 min</div>
+                    <div class="phase-name" style="color: #9b59b6; font-weight: bold;">Tactical</div>
+                    <div class="phase-description">5.5-5.5-5.5-0</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p1')">Praticar Agora</button>
+        </div>
+
+        <!-- P2 - Maximização Atencional -->
+        <div class="protocol-container" id="p2">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P2</span>
+                    <h3 class="protocol-title">Foco Diamante</h3>
+                </div>
+                <span class="protocol-purpose">Maximização Atencional</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">Sequência de 12 minutos que otimiza estados de alta concentração. A combinação de padrões simétricos com transições calculadas cria coerência cardíaca ideal para trabalho cognitivo intenso e aprendizado profundo.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">6 min</div>
+                    <div class="phase-name" style="color: #9b59b6; font-weight: bold;">Box Plus</div>
+                    <div class="phase-description">6-6-6-6</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">4 min</div>
+                    <div class="phase-name" style="color: #3498db; font-weight: bold;">Customizado Rápido</div>
+                    <div class="phase-description">4-2-4-2</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">2 min</div>
+                    <div class="phase-name" style="color: #9b59b6; font-weight: bold;">Box Plus</div>
+                    <div class="phase-description">6-6-6-6</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p2')">Praticar Agora</button>
+        </div>
+
+        <!-- P3 - Preparação para Meditação -->
+        <div class="protocol-container" id="p3">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P3</span>
+                    <h3 class="protocol-title">Portal Vipassana</h3>
+                </div>
+                <span class="protocol-purpose">Preparação para Meditação Longa</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">Preparação de 15 minutos para estados meditativos profundos. Cada fase de 5 minutos progressivamente aprofunda o relaxamento e prepara o sistema nervoso para jhanas e estados de absorção. Ideal para sessões de 90 minutos ou mais.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #1abc9c; font-weight: bold;">Sossega Leão</div>
+                    <div class="phase-description">4-7-8-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #9b59b6; font-weight: bold;">Equilibrado</div>
+                    <div class="phase-description">6-3-6-3</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #e74c3c; font-weight: bold;">Endurance Mod</div>
+                    <div class="phase-description">6-0-12-6</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p3')">Praticar Agora</button>
+        </div>
+
+        <!-- P4 - Reset Neural -->
+        <div class="protocol-container" id="p4">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P4</span>
+                    <h3 class="protocol-title">Reset Neural</h3>
+                </div>
+                <span class="protocol-purpose">Recuperação Pós-Esforço Mental</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">Protocolo de 10 minutos para recuperação cognitiva após períodos intensos de trabalho mental. As exalações prolongadas "lavam" circuitos neurais sobrecarregados, restaurando clareza e reduzindo fadiga mental.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">4 min</div>
+                    <div class="phase-name" style="color: #1abc9c; font-weight: bold;">Exalação Tripla</div>
+                    <div class="phase-description">3-0-9-3</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">4 min</div>
+                    <div class="phase-name" style="color: #3498db; font-weight: bold;">Tranquilidade</div>
+                    <div class="phase-description">3-0-6-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">2 min</div>
+                    <div class="phase-name" style="color: #95a5a6; font-weight: bold;">Respiração Natural</div>
+                    <div class="phase-description">Observação</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p4')">Praticar Agora</button>
+        </div>
+
+        <!-- P5 - Ignição Metabólica -->
+        <div class="protocol-container" id="p5">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P5</span>
+                    <h3 class="protocol-title">Ignição Metabólica</h3>
+                </div>
+                <span class="protocol-purpose">Preparação para Exercício</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">Sequência de preparação para atividade física intensa como pular corda ou ciclismo. Otimiza a eficiência mitocondrial e prepara o sistema tampão para o acúmulo de lactato durante exercício.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">3 min</div>
+                    <div class="phase-name" style="color: #3498db; font-weight: bold;">Melhor Ventilação</div>
+                    <div class="phase-description">3-0-8-1.8</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">30 ciclos</div>
+                    <div class="phase-name" style="color: #e74c3c; font-weight: bold;">Wim Hof Mod</div>
+                    <div class="phase-description">2-1-2-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">2 min</div>
+                    <div class="phase-name" style="color: #f39c12; font-weight: bold;">Energia Calma</div>
+                    <div class="phase-description">5-0-2-0</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p5')">Praticar Agora</button>
+        </div>
+
+        <!-- P6 - Regeneração Profunda -->
+        <div class="protocol-container" id="p6">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P6</span>
+                    <h3 class="protocol-title">Regeneração Profunda</h3>
+                </div>
+                <span class="protocol-purpose">Recuperação Pós-Exercício</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">Protocolo de 15 minutos que acelera recuperação muscular através de ativação parassimpática profunda. As mudanças de pressão intratorácica melhoram circulação linfática e remoção de metabólitos.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #1abc9c; font-weight: bold;">Sossega Leão</div>
+                    <div class="phase-description">4-7-8-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #3498db; font-weight: bold;">Dupla Exalação</div>
+                    <div class="phase-description">5-0-10-5</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">5 min</div>
+                    <div class="phase-name" style="color: #9b59b6; font-weight: bold;">Box Plus</div>
+                    <div class="phase-description">6-6-6-6</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p6')">Praticar Agora</button>
+        </div>
+
+        <!-- P7 - Gaming Competitivo -->
+        <div class="protocol-container" id="p7">
+            <div class="protocol-header">
+                <div>
+                    <span class="protocol-id">P7</span>
+                    <h3 class="protocol-title">Zona de Fluxo Tático</h3>
+                </div>
+                <span class="protocol-purpose">Gaming Competitivo</span>
+            </div>
+            
+            <p style="margin-bottom: 2rem;">10 minutos que otimizam "vigilância relaxada" - combinação única de calma absoluta com reflexos ultrarrápidos. Essencial para FPS e situações que exigem precisão milimétrica sob pressão intensa.</p>
+            
+            <div class="protocol-timeline">
+                <div class="timeline-phase">
+                    <div class="phase-duration">4 min</div>
+                    <div class="phase-name" style="color: #9b59b6; font-weight: bold;">Tactical</div>
+                    <div class="phase-description">5.5-5.5-5.5-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">3 min</div>
+                    <div class="phase-name" style="color: #3498db; font-weight: bold;">Box Rápido</div>
+                    <div class="phase-description">4-4-4-0</div>
+                </div>
+                <div class="timeline-phase">
+                    <div class="phase-duration">3 min</div>
+                    <div class="phase-name" style="color: #e74c3c; font-weight: bold;">Energia Calma</div>
+                    <div class="phase-description">5-0-2-0</div>
+                </div>
+            </div>
+
+            <button class="btn btn-practice" onclick="PranaHub.startPracticeMode('p7')">Praticar Agora</button>
+        </div>
+    </section>
+
+    <!-- Seção de Ciência -->
+    <section class="section" id="science">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem;">Base Científica</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; color: #666;">
+            Compreenda os mecanismos neurofisiológicos por trás de cada técnica
+        </p>
+
+        <div class="insights-grid">
+            <div class="insight-card">
+                <h3>Sistema Nervoso Autônomo</h3>
+                <p>A respiração é a única função vital sob controle consciente que pode modular diretamente o sistema nervoso autônomo. Através do nervo vago e complexo pré-Bötzinger, podemos influenciar estados fisiológicos fundamentais.</p>
+                <div class="demo-circle" style="width: 100px; height: 100px; font-size: 0.8rem;">SNS ↔ PNS</div>
+            </div>
+
+            <div class="insight-card">
+                <h3>Variabilidade da Frequência Cardíaca</h3>
+                <p>Padrões respiratórios específicos aumentam a VFC, um marcador de resiliência e saúde. Respirações de 5-6 ciclos/minuto criam ressonância cardiovascular, otimizando a comunicação coração-cérebro.</p>
+                <div class="breath-flow" style="height: 100px;">
+                    <div class="flow-phase phase-inhale" style="width: 50%;">HRV ↑</div>
+                    <div class="flow-phase phase-exhale" style="width: 50%; left: 50%;">Coerência</div>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <h3>Neurotransmissores e Respiração</h3>
+                <p>Diferentes padrões modulam a liberação de neurotransmissores específicos. Exalações longas aumentam GABA (calma), enquanto respirações rápidas elevam noradrenalina (alerta) e dopamina (motivação).</p>
+                <ul class="benefits-list">
+                    <li>GABA: Expiração 2x maior que inspiração</li>
+                    <li>Serotonina: Respiração rítmica consistente</li>
+                    <li>Endorfinas: Retenções prolongadas</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Padrões -->
+    <section class="section" id="patterns">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 1rem;">Biblioteca de Padrões</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem; color: var(--text-secondary);">
+            Todos os padrões respiratórios utilizados nos protocolos. Estrutura: Inspiração - Retenção(cheio) - Expiração - Retenção(vazio)
+        </p>
+
+        <div class="patterns-overview">
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(0)">
+                <div class="pattern-code">4-7-8-0</div>
+                <div class="pattern-name">Sossega Leão</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(1)">
+                <div class="pattern-code">6-6-6-6</div>
+                <div class="pattern-name">Box Plus</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(2)">
+                <div class="pattern-code">5-0-2-0</div>
+                <div class="pattern-name">Energia Calma</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(3)">
+                <div class="pattern-code">4-0-6-0</div>
+                <div class="pattern-name">Calma</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(4)">
+                <div class="pattern-code">5-0-8-5</div>
+                <div class="pattern-name">Endurance</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(5)">
+                <div class="pattern-code">3-0-8-1.8</div>
+                <div class="pattern-name">Melhor Ventilação</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(6)">
+                <div class="pattern-code">3-0-6-0</div>
+                <div class="pattern-name">Tranquilidade</div>
+            </div>
+            <div class="pattern-mini" onclick="PranaHub.practicePattern(7)">
+                <div class="pattern-code">5.5-5.5-5.5-0</div>
+                <div class="pattern-name">Tactical</div>
             </div>
         </div>
 
-        <!-- Script principal -->
-        <script src="script.js"></script>
-    </body>
+        <div class="pattern-explanation">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Como interpretar os padrões:</h3>
+            <p style="line-height: 1.8;">Cada número representa segundos em uma fase específica da respiração. Por exemplo, no padrão <strong>4-7-8-0</strong>:</p>
+            <ul style="margin-top: 1rem; line-height: 2;">
+                <li><strong>4</strong> segundos de inspiração (pelo nariz)</li>
+                <li><strong>7</strong> segundos segurando com pulmões cheios</li>
+                <li><strong>8</strong> segundos de expiração (pela boca ou nariz)</li>
+                <li><strong>0</strong> segundos de pausa com pulmões vazios</li>
+            </ul>
+            <p style="margin-top: 1.5rem;">A escolha de cada proporção ativa diferentes respostas do sistema nervoso, permitindo personalização precisa dos efeitos desejados.</p>
+        </div>
+    </section>
+
+    <!-- Seção de Prática como parte do hub -->
+    <section class="section" id="practice">
+        <div class="container loading-overlay">
+        
+            <div class="spinner"></div>
+
+            <div class="practice-content">
+                <section class="animation-area animation-card">
+                    <div class="canvas-container">
+                        <canvas id="breath-circle" width="480" height="480"></canvas>
+                    </div>
+
+                    <div class="practice-tabs">
+                        <div class="practice-tab active" id="tab-pattern">Prática Livre</div>
+                        <div class="practice-tab" id="tab-protocol">Protocolo Guiado</div>
+                    </div>
+                </section>
+
+                <section class="pattern-area controls-card" id="content-pattern">
+                    <div class="timer-selection">
+                        <label>Duração:</label>
+                        <button class="timer-btn active" data-minutes="5">5 min</button>
+                        <button class="timer-btn" data-minutes="10">10 min</button>
+                        <button class="timer-btn" data-minutes="15">15 min</button>
+                        <button class="timer-btn" data-minutes="0">Contínuo</button>
+                    </div>
+                    <div class="animation-style-selection">
+                        <label>Estilo de Animação:</label>
+                        <button class="style-btn active" data-style="Ring">Ring</button>
+                        <button class="style-btn" data-style="Bordered">Bordered</button>
+                        <button class="style-btn" data-style="Box">Box</button>
+                        <button class="style-btn" data-style="Legacy">Legacy</button>
+                    </div>
+                    <div class="global-controls">
+                        <button id="audioBtn" title="Silenciar/ativar áudio" aria-label="Silenciar ou ativar áudio">🔊</button>
+                    </div>
+                    <div class="pattern-row">
+                        <select id="patternSelect" aria-label="Selecionar padrão de respiração"></select>
+                        <button id="startPatternBtn" aria-label="Iniciar respiração padrão">Iniciar</button>
+                        <button id="stopBtn" aria-label="Parar respiração" disabled>Parar</button>
+                    </div>
+                    <div class="pattern-info status-display">
+                        <h3 id="patternName"></h3>
+                        <p id="phaseName"></p>
+                        <p id="patternTimer"></p>
+                    </div>
+                </section>
+
+                <section class="protocol-area controls-card" id="content-protocol">
+                    <div class="protocol-row">
+                        <select id="protocolSelect" aria-label="Selecionar protocolo de respiração"></select>
+                        <button id="startProtocolBtn" aria-label="Iniciar protocolo">Confirmar Início</button>
+                        <button id="cancelProtocolBtn" aria-label="Cancelar protocolo" disabled>Cancelar Protocolo</button>
+                    </div>
+                    <div class="protocol-status">
+                        <div id="stageStatus" tabindex="0"></div>
+                        <progress id="protocolProgress" value="0" max="1"></progress>
+                        <div id="protocolTimer" tabindex="0"></div>
+                        <div id="nextPreview" tabindex="0"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+    <script type="module" src="js/main.js"></script>
+
+</body>
 </html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Legacy Animation</title>
+    <style>
+        :root {
+            --color-inhale: #4a90e2;
+            --color-hold-in: #9b59b6;
+            --color-exhale: #1abc9c;
+            --color-hold-out: #e74c3c;
+            --border-color: #666;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        canvas {
+            border: 2px solid #333;
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .info {
+            margin: 10px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste da Animação Legacy</h1>
+    
+    <div class="info">
+        <h3>Status:</h3>
+        <div id="status">Carregando...</div>
+    </div>
+    
+    <div class="controls">
+        <button onclick="testLegacyAnimation()">Testar Animação Legacy</button>
+        <button onclick="testBoxBreathing()">Testar Box Breathing</button>
+        <button onclick="stopAnimation()">Parar</button>
+    </div>
+    
+    <canvas id="test-canvas" width="480" height="480"></canvas>
+    
+    <script type="module">
+        import { AnimationEngine } from './js/engines/AnimationEngine.js';
+        import { BreathingPattern, PHASE_TYPES } from './js/core/BreathingPattern.js';
+        
+        let animationEngine;
+        let testPattern;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa o AnimationEngine
+            animationEngine = new AnimationEngine('test-canvas');
+            
+            // Cria um padrão de teste para Box Breathing
+            testPattern = new BreathingPattern('Box Plus', [
+                { type: PHASE_TYPES.INHALE, duration: 4 },
+                { type: PHASE_TYPES.HOLD_IN, duration: 4 },
+                { type: PHASE_TYPES.EXHALE, duration: 4 },
+                { type: PHASE_TYPES.HOLD_OUT, duration: 4 }
+            ]);
+            
+            // Atualiza o status
+            document.getElementById('status').innerHTML = '✅ AnimationEngine carregado com sucesso!';
+            
+            // Expõe funções globais
+            window.testLegacyAnimation = () => {
+                animationEngine.setAnimationStyle('Legacy');
+                animationEngine.loadPattern(testPattern);
+                animationEngine.start();
+                document.getElementById('status').innerHTML = '🎨 Animação Legacy rodando...';
+            };
+            
+            window.testBoxBreathing = () => {
+                animationEngine.loadPattern(testPattern);
+                animationEngine.start();
+                document.getElementById('status').innerHTML = `🎨 Box Breathing rodando com estilo: ${animationEngine.animationStyle}`;
+            };
+            
+            window.stopAnimation = () => {
+                animationEngine.stop();
+                document.getElementById('status').innerHTML = '⏹️ Animação parada';
+            };
+        });
+    </script>
+</body>
+</html>
