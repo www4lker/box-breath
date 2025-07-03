@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Breathwork Explorer - Portal de Protocolos Respiratórios Avançados</title>
+    <title>PranaWorks - Portal de Protocolos Respiratórios Avançados</title>
+
+    <!-- Favicons e ícones de aplicativo -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <!-- Para PWA (Progressive Web App) -->
+    <meta name="theme-color" content="#4a90e2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PranaWorks">
 
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/themes.css" />
@@ -575,18 +587,20 @@
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 0.5rem;
+                padding: 0.75rem 1rem; /* Reduzir padding em mobile */
             }
             
             .nav-item {
                 margin: 0.25rem;
                 font-size: 0.9rem;
+                padding: 0.4rem 1rem; /* Reduzir padding dos itens */
             }
 
             #themeBtn {
                 order: 1;
                 margin: 0.5rem;
                 font-size: 1rem;
-                padding: 0.5rem 0.75rem;
+                padding: 0.4rem 0.6rem; /* Reduzir padding do botão */
             }
 
             .protocol-tabs {
@@ -606,6 +620,18 @@
                 flex-direction: column;
                 gap: 0.75rem;
                 padding: 0.75rem;
+            }
+
+            /* Fix para seção de prática - adicionar margem superior suficiente */
+            #practice {
+                padding-top: 6rem; /* Espaço adicional para compensar header */
+            }
+        }
+
+        /* Media query específica para telas de 412px-520px */
+        @media (max-width: 520px) and (min-width: 412px) {
+            #practice {
+                padding-top: 7rem; /* Mais espaço para essas telas específicas */
             }
         }
 
@@ -808,6 +834,8 @@
             text-decoration: none;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            z-index: 20;
+            pointer-events: auto;
         }
         
         .disclaimer-link:hover {
@@ -1076,8 +1104,8 @@
         <div class="breathing-circle" style="animation-delay: 1s;"></div>
         <div class="breathing-circle" style="animation-delay: 2s;"></div>
         <div class="hero-content">
-            <h1>Breathwork Explorer</h1>
-            <p>Desbloqueie o poder da respiração consciente através de protocolos cientificamente validados e sabedoria milenar</p>
+            <h1>PranaWorks</h1>
+            <p>Ciência ancestral da respiração consciente para despertar, cura e transformação integral de corpo, mente e espírito</p>
             <button class="btn" onclick="PranaHub.showSection('protocols')">Explorar Protocolos</button>
         </div>
     </div>
@@ -1445,6 +1473,14 @@
                     <li>Endorfinas: Retenções prolongadas</li>
                 </ul>
             </div>
+
+            <div class="insight-card">
+                <h3>📚 Relatórios de Pesquisa</h3>
+                <p>Acesse estudos detalhados e análises científicas sobre os fundamentos do Pranayama, neuroplasticidade e estados alterados de consciência através de técnicas respiratórias controladas.</p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="https://docs.google.com/document/d/e/2PACX-1vSl5iKnLRu8KLn1Ay9AwhBATD7xjm9b8wdX01xVo9iGesClpGl40K87gCNEzbMKWiC9ng31c7wFfhYE/pub" target="_blank" class="btn" style="background: linear-gradient(135deg, #4a90e2, #357abd); color: white; text-decoration: none; padding: 1rem 1.5rem; border-radius: 8px; display: inline-block; margin-right: 1rem;">🔬 Ler Relatórios</a>
+                </div>
+            </div>
         </div>
 
         <!-- Disclaimer Legal -->
@@ -1458,15 +1494,6 @@
                     <li>Interrompa imediatamente se sentir tontura forte, dor no peito, náusea ou qualquer desconforto significativo.</li>
                 </ul>
                 <p>O uso das técnicas é de responsabilidade exclusiva do praticante. Para o texto completo, consulte o <a href="#" onclick="showDisclaimerModal();return false;" style="color: #856404; text-decoration: underline; font-weight: bold;">disclaimer legal completo</a>.</p>
-            </div>
-        </div>
-        <!-- Modal do Disclaimer Completo -->
-        <div class="disclaimer-modal" id="disclaimerModal">
-            <div class="disclaimer-content">
-                <span class="disclaimer-close" onclick="closeDisclaimerModal()">&times;</span>
-                <div id="disclaimerFullText" style="white-space: pre-line; font-size: 1.05rem; line-height: 1.7; color: #222;">
-                    <!-- Conteúdo do disclaimer será inserido via JS -->
-                </div>
             </div>
         </div>
     </section>
@@ -1623,9 +1650,9 @@
                     </div>
                     <div class="pattern-row">
                         <select id="patternSelect" aria-label="Selecionar padrão de respiração"></select>
-                        <button id="startPatternBtn" aria-label="Iniciar respiração padrão">Iniciar</button>
+                        <button id="startPatternBtn" aria-label="Iniciar respiração padrão" onclick="PranaHub.startPatternPractice()">Iniciar</button>
                         <button id="stopBtn" aria-label="Parar respiração" disabled>Parar</button>
-                        <button id="audioBtn" class="audio-control" title="Controlar áudio" aria-label="Ativar/desativar áudio" style="display: inline-block;">🔊</button>
+                        <button class="audio-control" title="Desativar áudio" aria-label="Ativar/desativar áudio" style="display: inline-block;" aria-pressed="true">🔊</button>
                     </div>
                     <div class="pattern-description">
                         <p id="patternDescription">Selecione um padrão de respiração para começar sua prática</p>
@@ -1635,7 +1662,7 @@
                 <section class="protocol-area controls-card" id="content-protocol">
                     <div class="protocol-row">
                         <select id="protocolSelect" aria-label="Selecionar protocolo de respiração"></select>
-                        <button id="startProtocolBtn" aria-label="Iniciar protocolo">Confirmar Início</button>
+                        <button id="startProtocolBtn" aria-label="Iniciar protocolo" onclick="PranaHub.startProtocolPractice()">Confirmar Início</button>
                         <button id="cancelProtocolBtn" aria-label="Cancelar protocolo" disabled>Cancelar Protocolo</button>
                         <button class="audio-control" title="Controlar áudio" aria-label="Ativar/desativar áudio" style="display: inline-block;">🔊</button>
                     </div>
@@ -1648,8 +1675,39 @@
                 </section>
             </div>
         </div>
-        <a href="#" class="disclaimer-link" onclick="showDisclaimerModal();return false;" title="Orientações de Segurança e Termo de Responsabilidade">⚠️ Orientações de Segurança</a>
+        <a href="#" class="disclaimer-link" style="position: static; display: block; margin: 2rem auto 0; text-align: center; z-index: 20;" onclick="showDisclaimerModal();return false;" title="Orientações de Segurança e Termo de Responsabilidade">⚠️ Orientações de Segurança</a>
     </section>
+    <!-- Modal do Disclaimer Completo -->
+    <div class="disclaimer-modal" id="disclaimerModal">
+        <div class="disclaimer-content">
+            <span class="disclaimer-close" onclick="closeDisclaimerModal()">&times;</span>
+            <div id="disclaimerFullText" style="white-space: pre-line; font-size: 1.05rem; line-height: 1.7; color: #222;">
+                <!-- Conteúdo do disclaimer será inserido via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer com links do projeto -->
+    <footer style="background: #2c3e50; color: #ecf0f1; padding: 2rem 0; margin-top: 3rem; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+        <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; margin-bottom: 2rem;">
+        <div style="min-width: 250px;">
+        <h3 style="color: #4a90e2; margin-bottom: 1rem; font-size: 1.2rem;">📚 Relatórios e Pesquisa</h3>
+        <p style="margin-bottom: 1rem; line-height: 1.6;">Acesse estudos detalhados sobre os fundamentos científicos e benefícios do Pranayama.</p>
+        <a href="https://docs.google.com/document/d/e/2PACX-1vSl5iKnLRu8KLn1Ay9AwhBATD7xjm9b8wdX01xVo9iGesClpGl40K87gCNEzbMKWiC9ng31c7wFfhYE/pub" style="color: #48d1cc; text-decoration: none; font-weight: 500;" target="_blank">🔬 Ler Relatórios Relacionados</a>
+        </div>
+        <div style="min-width: 250px;">
+        <h3 style="color: #4a90e2; margin-bottom: 1rem; font-size: 1.2rem;">🛠️ Código Aberto</h3>
+        <p style="margin-bottom: 1rem; line-height: 1.6;">Contribua com o projeto ou crie sua própria versão da plataforma.</p>
+        <a href="https://github.com/www4lker/pranaworks" style="color: #48d1cc; text-decoration: none; font-weight: 500;" target="_blank">⭐ Fork This Repository</a>
+        </div>
+        </div>
+            <div style="border-top: 1px solid #34495e; padding-top: 1.5rem; color: #bdc3c7; font-size: 0.9rem;">
+                <p>PranaWorks &copy; 2025 - Desenvolvido com Claude Sonnet 4</p>
+                <p style="margin-top: 0.5rem;">"A respiração é a ponte entre o corpo e a mente, entre o consciente e o inconsciente."</p>
+            </div>
+        </div>
+    </footer>
     <script type="module" src="js/main.js"></script>
     <script>
         // Modal do disclaimer legal completo
@@ -1657,12 +1715,58 @@
             const modal = document.getElementById('disclaimerModal');
             const content = document.getElementById('disclaimerFullText');
             if (modal && content) {
-                fetch('breathwork-safety-disclaimer.md')
-                    .then(r => r.text())
-                    .then(text => {
-                        content.textContent = text;
-                        modal.style.display = 'block';
-                        document.body.style.overflow = 'hidden';
+                // Mostra loading enquanto carrega
+                content.textContent = 'Carregando orientações de segurança...';
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                fetch('breathwork-safety-disclaimer.html')
+                    .then(r => {
+                        if (!r.ok) {
+                            throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                        }
+                        return r.text();
+                    })
+                    .then(html => {
+                        content.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar disclaimer:', error);
+                        // Fallback com conteúdo básico
+                        content.innerHTML = `
+                            <h1>ORIENTAÇÕES DE SEGURANÇA E TERMO DE RESPONSABILIDADE</h1>
+                            <h2>Exercícios Respiratórios (Breathwork)</h2>
+                            
+                            <h3>⚠️ AVISO IMPORTANTE</h3>
+                            <p><strong>Consulte sempre um médico antes de iniciar qualquer programa de exercícios respiratórios</strong>, especialmente se possui condições médicas preexistentes.</p>
+                            
+                            <h3>CONTRAINDICAÇÕES</h3>
+                            <ul>
+                                <li>Doenças cardiovasculares ou histórico de problemas cardíacos</li>
+                                <li>Hipertensão arterial (pressão alta)</li>
+                                <li>Epilepsia ou histórico de convulsões</li>
+                                <li>Transtornos de ansiedade ou pânico</li>
+                                <li>Asma ou outras condições respiratórias</li>
+                                <li>Gravidez ou suspeita de gravidez</li>
+                                <li>Diabetes</li>
+                            </ul>
+                            
+                            <h3>PRECAUÇÕES DURANTE A PRÁTICA</h3>
+                            <ul>
+                                <li><strong>Nunca pratique enquanto dirige, opera máquinas ou próximo à água</strong></li>
+                                <li>Interrompa imediatamente se sentir tontura forte, dor no peito, náusea ou qualquer desconforto significativo</li>
+                                <li>Comece sempre com técnicas suaves e aumente gradualmente a intensidade</li>
+                                <li>Pratique em ambiente seguro, preferencialmente sentado ou deitado</li>
+                                <li>Mantenha-se hidratado antes e após a prática</li>
+                            </ul>
+                            
+                            <h3>TERMO DE RESPONSABILIDADE</h3>
+                            <p>O uso das técnicas de respiração apresentadas neste site é de <strong>responsabilidade exclusiva do praticante</strong>. Os criadores e mantenedores deste site não se responsabilizam por quaisquer danos, lesões ou consequências decorrentes do uso inadequado ou imprudente das técnicas.</p>
+                            
+                            <p><strong>Pratique com consciência e responsabilidade.</strong></p>
+                            
+                            <p><em>Erro ao carregar arquivo completo. Conteúdo básico exibido.</em></p>
+                        `;
                     });
             }
         }

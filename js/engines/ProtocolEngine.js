@@ -52,7 +52,7 @@ export class ProtocolEngine {
     this.progress = {};
     this.animationEngine.stop();
     log("Protocolo cancelado pelo usuário.");
-    // Atualiza a UI para refletir o cancelamento
+    
     this.uiController.update({ engineState: this });
   }
 
@@ -96,6 +96,7 @@ export class ProtocolEngine {
     this.state = ProtocolStates.FINISHED;
     this.animationEngine.stop();
     log("Protocolo finalizado com sucesso!");
+    
     this.uiController.update({ engineState: this });
   }
 

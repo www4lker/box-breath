@@ -14,6 +14,9 @@ export class UIController {
       protocol: { selectedIndex: 0 }
     };
     
+    this.isExerciseActive = false; // Controla se há exercício em andamento
+    this._visibilityHandler = null; // Handler para detecção de saída da aba
+
     this.cacheDOMElements();
     this.populateSelects();
     this.initTheme(); 
@@ -40,29 +43,24 @@ export class UIController {
     this.updateAudioButtons(isMuted);
   }
 
-  // 🎯 NOVO: Método para alternar áudio e atualizar todos os botões
   toggleAudio() {
     const isEnabled = this.audioEngine.enabled;
     this.audioEngine.setMuted(isEnabled);
-    this.updateAudioButtons(isEnabled); // isEnabled = true significa que vai ficar muted
+    this.updateAudioButtons(isEnabled);
   }
 
-  // 🎯 NOVO: Método para atualizar todos os botões de áudio
   updateAudioButtons(isMuted) {
-    // Atualiza o botão principal (se existir)
     if (this.audioBtn) {
       this.audioBtn.textContent = isMuted ? '🔇' : '🔊';
       this.audioBtn.setAttribute('aria-pressed', !isMuted);
       this.audioBtn.setAttribute('data-tooltip', isMuted ? 'Ligar Som' : 'Desligar Som');
     }
 
-    // Atualiza todos os botões minimalistas
     this.audioControls?.forEach(btn => {
       btn.textContent = isMuted ? '🔇' : '🔊';
       btn.setAttribute('aria-pressed', !isMuted);
       btn.title = isMuted ? 'Ativar áudio' : 'Desativar áudio';
       
-      // Aplica classe visual para estado mutado
       if (isMuted) {
         btn.classList.add('muted');
       } else {
@@ -88,14 +86,8 @@ export class UIController {
     this.startPatternBtn = document.getElementById('startPatternBtn');
     this.stopBtn = document.getElementById('stopBtn');
     
-    // 🎯 ATUALIZADO: Novos elementos para a interface simplificada
     this.patternDescription = document.getElementById('patternDescription');
     this.patternDescriptionContainer = document.querySelector('.pattern-description');
-    
-    // 🎯 REMOVIDO: Elementos antigos que não existem mais
-    // this.patternName = document.getElementById('patternName');
-    // this.phaseName = document.getElementById('phaseName');
-    // this.patternTimer = document.getElementById('patternTimer');
     
     this.protocolSelect = document.getElementById('protocolSelect');
     this.startProtocolBtn = document.getElementById('startProtocolBtn');
@@ -106,9 +98,8 @@ export class UIController {
     this.protocolTimer = document.getElementById('protocolTimer');
     this.nextPreview = document.getElementById('nextPreview');
     
-    // 🎯 NOVO: Busca todos os botões de áudio (tanto na área de padrões quanto protocolos)
-    this.audioBtn = document.getElementById('audioBtn'); // Botão principal (ainda usado)
-    this.audioControls = document.querySelectorAll('.audio-control'); // Novos botões minimalistas
+    this.audioBtn = document.getElementById('audioBtn');
+    this.audioControls = document.querySelectorAll('.audio-control');
     this.volSlider = document.getElementById('volSlider');
     this.themeBtn = document.getElementById('themeBtn');
     this.timerButtons = document.querySelectorAll('.timer-btn');
@@ -125,8 +116,12 @@ export class UIController {
   }
 
   bindEventListeners() {
-    this.tabPattern?.addEventListener('click', () => this.showPracticeTab('pattern'));
-    this.tabProtocol?.addEventListener('click', () => this.showPracticeTab('protocol'));
+    this.tabPattern?.addEventListener('click', () => {
+      this.showPracticeTab('pattern');
+    });
+    this.tabProtocol?.addEventListener('click', () => {
+      this.showPracticeTab('protocol');
+    });
 
     this.startPatternBtn?.addEventListener('click', () => {
       this.audioEngine.resumeContext();
@@ -136,11 +131,13 @@ export class UIController {
         this.animationEngine.stop();
         this.stopBtn.disabled = true;
         this.startPatternBtn.disabled = false;
+        this.setExerciseActive(false);
         this.updatePatternInfo(null);
       });
       this.animationEngine.start();
       this.stopBtn.disabled = false;
       this.startPatternBtn.disabled = true;
+      this.setExerciseActive(true);
       this.updatePatternInfo(selectedPattern);
     });
     
@@ -148,6 +145,7 @@ export class UIController {
       this.animationEngine.stop();
       this.stopBtn.disabled = true;
       this.startPatternBtn.disabled = false;
+      this.setExerciseActive(false);
       this.updatePatternInfo(null);
     });
     
@@ -157,12 +155,13 @@ export class UIController {
     
     this.startProtocolBtn?.addEventListener('click', () => {
       this.audioEngine.resumeContext();
+      this.setExerciseActive(true);
       this.protocolEngine.startSelectedProtocol();
     });
     
     this.cancelProtocolBtn?.addEventListener('click', () => {
       this.protocolEngine.cancelProtocol();
-      // Mantém na página de prática para escolher outro exercício
+      this.setExerciseActive(false);
       this.showPracticeTab('pattern');
     });
     
@@ -184,7 +183,6 @@ export class UIController {
       this.toggleAudio();
     });
     
-    // 🎯 NOVO: Event listeners para todos os botões de áudio minimalistas
     this.audioControls?.forEach(btn => {
       btn.addEventListener('click', () => {
         this.toggleAudio();
@@ -202,7 +200,10 @@ export class UIController {
       this.themeBtn.textContent = isDark ? '☀️' : '🌙';
     });
     
-    // Adiciona listener para botões de estilo de animação
+    this.patternSelect?.addEventListener('change', () => {
+      this._updateBoxButtonState();
+    });
+    
     this.styleButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         this.styleButtons.forEach(b => b.classList.remove('active'));
@@ -211,6 +212,32 @@ export class UIController {
         this.animationEngine.setAnimationStyle(style);
       });
     });
+    
+    this._updateBoxButtonState();
+  }
+
+  _updateBoxButtonState() {
+    if (!this.styleButtons) return;
+    const selectedPatternIdx = this.patternSelect?.value ?? 0;
+    const selectedPattern = patterns?.[selectedPatternIdx] || (patterns ? patterns[0] : null);
+    const boxBtn = Array.from(this.styleButtons).find(btn => btn.dataset.style === 'Box');
+    if (!boxBtn) return;
+    if (selectedPattern && selectedPattern.name === 'Box Plus') {
+      boxBtn.disabled = false;
+      boxBtn.style.opacity = '1';
+      boxBtn.style.pointerEvents = '';
+      boxBtn.classList.remove('disabled');
+    } else {
+      boxBtn.disabled = true;
+      boxBtn.style.opacity = '0.4';
+      boxBtn.style.pointerEvents = 'none';
+      boxBtn.classList.add('disabled');
+      if (boxBtn.classList.contains('active')) {
+        boxBtn.classList.remove('active');
+        const ringBtn = Array.from(this.styleButtons).find(btn => btn.dataset.style === 'Ring');
+        if (ringBtn) ringBtn.classList.add('active');
+      }
+    }
   }
 
   _saveCurrentState() {
@@ -237,30 +264,24 @@ export class UIController {
   }
 
   updatePatternInfo(pattern) {
-    // 🎯 Método simplificado para a nova interface minimalista
-    // Em vez de mostrar informações dinâmicas, mostramos uma descrição clara e estática
     this.updatePatternDescription(pattern);
   }
 
-  // 🎯 NOVO: Método para atualizar a descrição do padrão selecionado
   updatePatternDescription(pattern) {
     if (!this.patternDescription || !this.patternDescriptionContainer) return;
     
     if (pattern) {
-      // Quando um padrão é selecionado, mostramos sua descrição
       const duration = this.selectedDuration > 0 ? `${this.selectedDuration} min` : 'contínuo';
       const description = this.getPatternDescription(pattern);
       
       this.patternDescription.textContent = `${pattern.name}: ${description} (${duration})`;
       this.patternDescriptionContainer.classList.add('active');
     } else {
-      // Quando nenhum padrão está ativo, mostramos a mensagem padrão
       this.patternDescription.textContent = 'Selecione um padrão de respiração para começar sua prática';
       this.patternDescriptionContainer.classList.remove('active');
     }
   }
 
-  // 🎯 NOVO: Método para obter descrição clara de cada padrão
   getPatternDescription(pattern) {
     const descriptions = {
       'Sossega Leão': 'Relaxamento profundo com expiração prolongada',
@@ -277,14 +298,12 @@ export class UIController {
   }
 
   showSection(sectionId) {
-    // Esconde todas as seções e remove animação
     this.hubSections.forEach(section => {
       section.classList.remove('active', 'section-fade-in');
       section.style.display = 'none';
     });
     this.navItems.forEach(item => item.classList.remove('active'));
 
-    // Controle da home/hero section
     const homeSection = document.getElementById('home');
     if (sectionId === 'home') {
       if (homeSection) {
@@ -296,15 +315,13 @@ export class UIController {
       const sectionToShow = document.getElementById(sectionId);
       if (sectionToShow) {
         sectionToShow.style.display = 'block';
-        // Força reflow para reiniciar a animação
         void sectionToShow.offsetWidth;
         sectionToShow.classList.add('active', 'section-fade-in');
       }
     }
 
-    // Ativa o item de navegação correspondente
     const navItemToActivate = Array.from(this.navItems).find(nav => 
-      nav.getAttribute('onclick')?.includes(`'${sectionId}'`)
+      nav.getAttribute('data-section') === sectionId
     );
     if (navItemToActivate) {
       navItemToActivate.classList.add('active');
@@ -339,7 +356,6 @@ export class UIController {
         this.tabPattern.classList.add('active');
         this.tabProtocol.classList.remove('active');
         
-        // 🎯 NOVO: Restaura o estilo de animação escolhido pelo usuário para padrões individuais
         const activeStyleBtn = document.querySelector('.style-btn.active');
         if (activeStyleBtn) {
           const userSelectedStyle = activeStyleBtn.dataset.style;
@@ -351,7 +367,6 @@ export class UIController {
         this.tabPattern.classList.remove('active');
         this.tabProtocol.classList.add('active');
         
-        // 🎯 NOVO: Força animação Legacy para protocolos
         this.animationEngine.setAnimationStyle('Legacy');
       }
       
@@ -366,6 +381,55 @@ export class UIController {
       this.practiceState.protocol.selectedIndex = index;
     }
     this.showPracticeTab('protocol');
+  }
+
+  // ÚNICO sistema mantido: detecção de saída da aba
+  setExerciseActive(active = true) {
+    this.isExerciseActive = !!active;
+    
+    if (active) {
+      this._startTabVisibilityMonitoring();
+    } else {
+      this._stopTabVisibilityMonitoring();
+    }
+  }
+
+  _startTabVisibilityMonitoring() {
+    if (this._visibilityHandler) return;
+    
+    this._visibilityHandler = () => {
+      if (document.hidden && this.isExerciseActive) {
+        console.log('🔍 Usuário saiu da aba durante exercício - parando automaticamente');
+        this._handleTabExit();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', this._visibilityHandler);
+  }
+
+  _stopTabVisibilityMonitoring() {
+    if (this._visibilityHandler) {
+      document.removeEventListener('visibilitychange', this._visibilityHandler);
+      this._visibilityHandler = null;
+    }
+  }
+
+  _handleTabExit() {
+    // Para exercício e limpa estado
+    if (this.animationEngine) {
+      this.animationEngine.stop();
+    }
+    if (this.protocolEngine) {
+      this.protocolEngine.cancelProtocol();
+    }
+    
+    // Reseta botões
+    if (this.startPatternBtn) this.startPatternBtn.disabled = false;
+    if (this.stopBtn) this.stopBtn.disabled = true;
+    if (this.startProtocolBtn) this.startProtocolBtn.disabled = false;
+    if (this.cancelProtocolBtn) this.cancelProtocolBtn.disabled = true;
+    
+    this.setExerciseActive(false);
   }
 
   update({ engineState }) {
@@ -396,8 +460,6 @@ export class UIController {
 
     if (currentProtocol && currentStageIndex !== undefined) {
       const stage = currentProtocol.stages[currentStageIndex];
-      
-      // 🎯 NOVA FUNCIONALIDADE: Busca o texto guia para o estágio atual
       const stageGuide = getStageGuide(currentProtocol.id, currentStageIndex);
       
       if (isTransition) {
@@ -416,7 +478,6 @@ export class UIController {
             `A seguir: ${nextStage.pattern.name}`;
         }
       } else if (isRunning && stageGuide) {
-        // 🎯 NOVA FUNCIONALIDADE: Mostra o texto guia científico
         this.stageStatus.innerHTML = `
           <div class="stage-guide">
             <div class="stage-header">
@@ -428,11 +489,9 @@ export class UIController {
           </div>
         `;
       } else {
-        // Fallback para quando não há guia disponível
         this.stageStatus.textContent = `Estágio ${currentStageIndex + 1}/${currentProtocol.stages.length}: ${stage.pattern.name}`;
       }
       
-      // Timer e progresso permanecem iguais
       if (progress.totalProtocolTime && progress.totalElapsed !== undefined) {
         const totalSec = progress.totalProtocolTime;
         const elapsedSec = progress.totalElapsed;
@@ -444,14 +503,12 @@ export class UIController {
         this.protocolProgress.value = elapsedSec;
         this.protocolProgress.max = totalSec;
         
-        // Acessibilidade
         this.protocolProgress.setAttribute('aria-valuenow', elapsedSec.toFixed(0));
         this.protocolProgress.setAttribute('aria-valuemax', totalSec.toFixed(0));
         const percent = totalSec > 0 ? Math.round((elapsedSec / totalSec) * 100) : 0;
         this.protocolProgress.setAttribute('aria-valuetext', `${percent}% concluído`);
       }
       
-      // Limpa preview se não estiver em transição
       if (!isTransition) {
         this.nextPreview.textContent = '';
       }
@@ -474,7 +531,6 @@ export class UIController {
       this.protocolProgress.value = 0;
       this.protocolProgress.setAttribute('aria-valuenow', '0');
     } else {
-      // Estado IDLE - limpa as informações
       this.stageStatus.textContent = '';
       this.protocolTimer.textContent = '';
       this.nextPreview.textContent = '';

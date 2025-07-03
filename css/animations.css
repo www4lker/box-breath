@@ -94,6 +94,7 @@ button, select, .nav-item, .protocol-tab {
 .loading-overlay.loading::after {
     opacity: 0.8;
     visibility: visible;
+    pointer-events: none;
 }
 
 /* Define o spinner (círculo giratório) */

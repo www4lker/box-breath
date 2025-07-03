@@ -77,13 +77,12 @@ export class AnimationEngine {
 
   loadPattern(pattern) {
     this.currentPattern = pattern;
-    
-    // Detecta automaticamente se é Box Breathing
-    if (pattern.name === 'Box Plus' && this._isBoxBreathingPattern(pattern)) {
-      this.setAnimationStyle('Legacy');
-      log(`AnimationEngine: Box Breathing detectado - mudando para estilo Legacy`);
+    // Associação automática: Box Plus permite Box, mas não força seleção
+    if (pattern.name !== 'Box Plus' && this.animationStyle === 'Box') {
+      // Se não for Box Plus, e o usuário estava com Box, força para Ring
+      this.setAnimationStyle('Ring');
+      log('AnimationEngine: Animação Box desativada para padrões assimétricos. Mudando para Ring.');
     }
-    
     log(`AnimationEngine: Padrão carregado - ${pattern.name}`);
   }
 
@@ -304,236 +303,146 @@ export class AnimationEngine {
     this.ctx.save();
     this.ctx.globalAlpha = this.globalAlpha;
 
+    // Tamanho do quadrado responsivo ao canvas
+    const minDim = Math.min(this.canvas.width, this.canvas.height);
+    const boxSize = Math.max(minDim * 0.55, 120); // 55% do menor lado, mínimo 120px
+    const halfSize = boxSize / 2;
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
-    const boxSize = this.config.box.size;
-    const halfSize = boxSize / 2;
-    
-    // Coordenadas da caixa
     const left = centerX - halfSize;
     const right = centerX + halfSize;
     const top = centerY - halfSize;
     const bottom = centerY + halfSize;
-    
+
+    // Configurações para renderização suave
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+    this.ctx.imageSmoothingEnabled = true;
+
     // Desenha a caixa com cantos arredondados
     const baseColor = this._getPhaseColor(currentPhase.type);
     this.ctx.strokeStyle = baseColor;
     this.ctx.lineWidth = this.config.box.strokeWidth;
-    this.ctx.lineCap = 'round';
-    this.ctx.lineJoin = 'round';
-    
-    // Sombra sutil
     this.ctx.shadowColor = baseColor;
-    this.ctx.shadowBlur = 8;
+    this.ctx.shadowBlur = 10;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
-    
     this.ctx.beginPath();
     this._roundRect(this.ctx, left, top, boxSize, boxSize, this.config.box.cornerRadius);
     this.ctx.stroke();
-    
-    // Calcula a posição da bolinha baseada na fase e progresso
-    const ballPosition = this._calculateBallPosition(currentPhase, progress, left, right, top, bottom);
-    
-    // Desenha a bolinha
+
+    // Calcula posição da bolinha ao longo do perímetro (movimento contínuo)
+    const globalProgress = this._calculateGlobalBoxProgress(phaseElapsed);
+    const ballPosition = this._calculateBoxBallPositionGlobal(globalProgress, left, right, top, bottom);
+
+    // Desenha sombra da bolinha (para profundidade visual)
+    this.ctx.save();
+    this.ctx.globalAlpha = this.globalAlpha * 0.3;
+    this.ctx.fillStyle = baseColor;
+    this.ctx.shadowColor = 'rgba(0,0,0,0.2)';
+    this.ctx.shadowBlur = 6;
+    this.ctx.shadowOffsetX = 2;
+    this.ctx.shadowOffsetY = 2;
+    this.ctx.beginPath();
+    this.ctx.arc(ballPosition.x + 1, ballPosition.y + 1, this.config.box.ballRadius * 0.8, 0, 2 * Math.PI);
+    this.ctx.fill();
+    this.ctx.restore();
+
+    // Desenha a bolinha principal
     this.ctx.save();
     this.ctx.fillStyle = baseColor;
     this.ctx.shadowColor = baseColor;
-    this.ctx.shadowBlur = 12;
-    
+    this.ctx.shadowBlur = 15;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
     this.ctx.beginPath();
     this.ctx.arc(ballPosition.x, ballPosition.y, this.config.box.ballRadius, 0, 2 * Math.PI);
     this.ctx.fill();
+    // Adiciona highlight na bolinha para efeito 3D
+    this.ctx.globalAlpha = 0.6;
+    this.ctx.fillStyle = this._lightenColor(baseColor, 0.3);
+    this.ctx.shadowBlur = 0;
+    this.ctx.beginPath();
+    this.ctx.arc(
+      ballPosition.x - this.config.box.ballRadius * 0.3, 
+      ballPosition.y - this.config.box.ballRadius * 0.3, 
+      this.config.box.ballRadius * 0.4, 
+      0, 2 * Math.PI
+    );
+    this.ctx.fill();
     this.ctx.restore();
-    
+
     // Desenha o texto central
     this._drawCentralText(currentPhase, phaseElapsed, centerX, centerY);
-    
     this.ctx.restore();
   }
 
-  _drawLegacyAnimation(progress, currentPhase, phaseElapsed) {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.save();
-    this.ctx.globalAlpha = this.globalAlpha;
-
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-    const maxRadius = Math.min(centerX, centerY) * 0.7; // Reduzido para dar mais espaço
-    const minRadius = 40; // Raio mínimo mais definido
-    
-    // 🎯 CORES MELHORADAS - baseadas nas fases respiratórias
-    const phaseColors = {
-      'INHALE': { primary: '#4fc3f7', secondary: '#29b6f6', accent: '#03a9f4' },     // Azul inspiração
-      'HOLD_IN': { primary: '#ab47bc', secondary: '#8e24aa', accent: '#9c27b0' },   // Roxo retenção cheia
-      'EXHALE': { primary: '#66bb6a', secondary: '#4caf50', accent: '#43a047' },    // Verde expiração
-      'HOLD_OUT': { primary: '#ff7043', secondary: '#ff5722', accent: '#f4511e' }  // Laranja retenção vazia
+  // Novo: calcula a posição da bolinha ao longo do perímetro do quadrado, sincronizado com o ciclo global
+  _calculateBoxBallPositionGlobal(globalProgress, left, right, top, bottom) {
+    // Calcula o comprimento de cada lado proporcional à duração das fases
+    if (!this.currentPattern) {
+      return { x: left, y: bottom };
+    }
+    const phases = this.currentPattern.phases;
+    const durations = phases.map(p => p.duration);
+    const totalDuration = durations.reduce((a, b) => a + b, 0);
+    // Lados: INHALE (baixo), HOLD_IN (direita), EXHALE (cima), HOLD_OUT (esquerda)
+    const sides = [
+      { from: { x: left, y: bottom }, to: { x: right, y: bottom } }, // INHALE
+      { from: { x: right, y: bottom }, to: { x: right, y: top } },   // HOLD_IN
+      { from: { x: right, y: top }, to: { x: left, y: top } },       // EXHALE
+      { from: { x: left, y: top }, to: { x: left, y: bottom } }      // HOLD_OUT
+    ];
+    // Calcula os pontos de corte ao longo do ciclo
+    let acc = 0;
+    const cuts = durations.map(d => {
+      const start = acc / totalDuration;
+      acc += d;
+      return start;
+    });
+    cuts.push(1); // Fim do ciclo
+    // Descobre em qual lado está o progresso global
+    let sideIdx = 0;
+    for (let i = 0; i < 4; i++) {
+      if (globalProgress >= cuts[i] && globalProgress < cuts[i + 1]) {
+        sideIdx = i;
+        break;
+      }
+    }
+    // Progresso local no lado
+    const localProgress = (globalProgress - cuts[sideIdx]) / (cuts[sideIdx + 1] - cuts[sideIdx]);
+    // Interpola ao longo do lado
+    const from = sides[sideIdx].from;
+    const to = sides[sideIdx].to;
+    // Suaviza a curva nos cantos
+    const cornerRadius = this.config.box.cornerRadius || 12;
+    const offset = cornerRadius * 0.6;
+    // Cria cópias ajustadas dos pontos, sem modificar os originais
+    let fx = from.x, fy = from.y, tx = to.x, ty = to.y;
+    if (sideIdx === 0) { fx = from.x + offset; tx = to.x - offset; }
+    if (sideIdx === 1) { fy = from.y - offset; ty = to.y + offset; }
+    if (sideIdx === 2) { fx = from.x - offset; tx = to.x + offset; }
+    if (sideIdx === 3) { fy = from.y + offset; ty = to.y - offset; }
+    // Interpolação linear
+    return {
+      x: fx + (tx - fx) * localProgress,
+      y: fy + (ty - fy) * localProgress
     };
-    
-    const colors = phaseColors[currentPhase.type] || phaseColors['INHALE'];
-    
-    // 🎯 CÁLCULO DO RAIO com animação suave
-    let radiusProgress = progress;
-    
-    // Easing suave para inspiração e expiração
-    if (currentPhase.type === 'INHALE' || currentPhase.type === 'EXHALE') {
-      // Easing quadrático para movimento mais natural
-      radiusProgress = currentPhase.type === 'INHALE' ? 
-        progress * progress : // Ease-in para inspiração
-        1 - ((1 - progress) * (1 - progress)); // Ease-out para expiração
-    }
-    
-    const currentRadius = minRadius + (maxRadius - minRadius) * radiusProgress;
-    
-    // 🎯 EFEITO DE PULSAÇÃO durante retenções
-    let pulseEffect = 1.0;
-    if (currentPhase.type === 'HOLD_IN' || currentPhase.type === 'HOLD_OUT') {
-      const pulseSpeed = 2; // Velocidade da pulsação
-      pulseEffect = 1 + Math.sin(phaseElapsed * pulseSpeed) * 0.05; // Pulsação sutil de 5%
-    }
-    
-    const finalRadius = currentRadius * pulseEffect;
-    
-    // 🎯 CAMADA 1: Aura externa (glow effect)
-    this.ctx.save();
-    const auraGradient = this.ctx.createRadialGradient(
-      centerX, centerY, finalRadius * 0.6,
-      centerX, centerY, finalRadius * 1.4
-    );
-    auraGradient.addColorStop(0, colors.primary + '40'); // 25% opacity
-    auraGradient.addColorStop(0.7, colors.secondary + '20'); // 12% opacity
-    auraGradient.addColorStop(1, colors.accent + '00'); // Transparente
-    
-    this.ctx.fillStyle = auraGradient;
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, finalRadius * 1.4, 0, 2 * Math.PI);
-    this.ctx.fill();
-    this.ctx.restore();
-    
-    // 🎯 CAMADA 2: Círculo principal com gradiente radial
-    this.ctx.save();
-    const mainGradient = this.ctx.createRadialGradient(
-      centerX - finalRadius * 0.3, centerY - finalRadius * 0.3, 0,
-      centerX, centerY, finalRadius
-    );
-    mainGradient.addColorStop(0, colors.primary + 'E6'); // 90% opacity
-    mainGradient.addColorStop(0.6, colors.secondary + 'CC'); // 80% opacity
-    mainGradient.addColorStop(1, colors.accent + 'B3'); // 70% opacity
-    
-    // Sombra suave
-    this.ctx.shadowColor = colors.primary + '80'; // 50% opacity
-    this.ctx.shadowBlur = 15;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 5;
-    
-    this.ctx.fillStyle = mainGradient;
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, finalRadius, 0, 2 * Math.PI);
-    this.ctx.fill();
-    this.ctx.restore();
-    
-    // 🎯 CAMADA 3: Contorno elegante
-    this.ctx.save();
-    this.ctx.strokeStyle = colors.accent;
-    this.ctx.lineWidth = 3;
-    this.ctx.shadowColor = colors.accent + '60'; // 38% opacity
-    this.ctx.shadowBlur = 8;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
-    
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, finalRadius, 0, 2 * Math.PI);
-    this.ctx.stroke();
-    this.ctx.restore();
-    
-    // 🎯 CAMADA 4: Círculo interno decorativo (durante retenções)
-    if (currentPhase.type === 'HOLD_IN' || currentPhase.type === 'HOLD_OUT') {
-      this.ctx.save();
-      const innerRadius = finalRadius * 0.3;
-      const innerGradient = this.ctx.createRadialGradient(
-        centerX, centerY, 0,
-        centerX, centerY, innerRadius
-      );
-      innerGradient.addColorStop(0, colors.primary + 'B3'); // 70% opacity
-      innerGradient.addColorStop(1, colors.primary + '40'); // 25% opacity
-      
-      this.ctx.fillStyle = innerGradient;
-      this.ctx.beginPath();
-      this.ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
-      this.ctx.fill();
-      this.ctx.restore();
-    }
-    
-    // 🎯 TEXTO CENTRAL aprimorado
-    this._drawEnhancedCentralText(currentPhase, phaseElapsed, centerX, centerY, colors);
-    
-    this.ctx.restore();
   }
 
-  _calculateBallPosition(phase, progress, left, right, top, bottom) {
-    // Para box breathing, a bolinha percorre o perímetro da caixa
-    // Cada lado representa uma fase da respiração
-    
-    const PHASE_TYPES = {
-      INHALE: 'INHALE',
-      HOLD_IN: 'HOLD_IN', 
-      EXHALE: 'EXHALE',
-      HOLD_OUT: 'HOLD_OUT'
-    };
-    
-    switch (phase.type) {
-      case PHASE_TYPES.INHALE:
-        // Lado inferior: da esquerda para direita
-        return {
-          x: left + (right - left) * progress,
-          y: bottom
-        };
-        
-      case PHASE_TYPES.HOLD_IN:
-        // Lado direito: de baixo para cima
-        return {
-          x: right,
-          y: bottom - (bottom - top) * progress
-        };
-        
-      case PHASE_TYPES.EXHALE:
-        // Lado superior: da direita para esquerda
-        return {
-          x: right - (right - left) * progress,
-          y: top
-        };
-        
-      case PHASE_TYPES.HOLD_OUT:
-        // Lado esquerdo: de cima para baixo
-        return {
-          x: left,
-          y: top + (bottom - top) * progress
-        };
-        
-      default:
-        return { x: left, y: bottom };
+  // Calcula o progresso global ao longo do ciclo box (0 a 1)
+  _calculateGlobalBoxProgress(phaseElapsed) {
+    if (!this.currentPattern) return 0;
+    const phases = this.currentPattern.phases;
+    let totalDuration = 0;
+    for (const p of phases) totalDuration += p.duration;
+    // Descobre o tempo decorrido desde o início do ciclo
+    let elapsed = 0;
+    for (let i = 0; i < this.phaseIndex; i++) {
+      elapsed += phases[i].duration;
     }
-  }
-
-  _isBoxBreathingPattern(pattern) {
-    // Verifica se o padrão tem 4 fases com durações iguais (característica do Box Breathing)
-    if (!pattern.phases || pattern.phases.length !== 4) {
-      return false;
-    }
-    
-    const phases = pattern.phases;
-    const firstDuration = phases[0].duration;
-    
-    // Verifica se todas as durações são iguais
-    const allEqual = phases.every(phase => phase.duration === firstDuration);
-    
-    // Verifica se tem todas as 4 fases do box breathing
-    const hasInhale = phases.some(p => p.type === 'INHALE');
-    const hasHoldIn = phases.some(p => p.type === 'HOLD_IN');
-    const hasExhale = phases.some(p => p.type === 'EXHALE');
-    const hasHoldOut = phases.some(p => p.type === 'HOLD_OUT');
-    
-    return allEqual && hasInhale && hasHoldIn && hasExhale && hasHoldOut;
+    elapsed += phaseElapsed;
+    return (elapsed / totalDuration) % 1;
   }
 
   _fade(start, end, durationSec) {
@@ -578,9 +487,8 @@ export class AnimationEngine {
   }
 
   _lightenColor(color, factor) {
-    // Método auxiliar para clarear uma cor
-    // Implementação simples para gradientes
-    if (color.startsWith('rgb')) {
+    // Método melhorado para clarear uma cor
+    if (color.startsWith('rgb(')) {
       const matches = color.match(/\d+/g);
       if (matches && matches.length >= 3) {
         const r = Math.min(255, parseInt(matches[0]) + Math.floor(255 * factor));
@@ -588,7 +496,15 @@ export class AnimationEngine {
         const b = Math.min(255, parseInt(matches[2]) + Math.floor(255 * factor));
         return `rgb(${r}, ${g}, ${b})`;
       }
+    } else if (color.startsWith('#')) {
+      // Suporte para cores hexadecimais
+      const hex = color.slice(1);
+      const r = Math.min(255, parseInt(hex.slice(0, 2), 16) + Math.floor(255 * factor));
+      const g = Math.min(255, parseInt(hex.slice(2, 4), 16) + Math.floor(255 * factor));
+      const b = Math.min(255, parseInt(hex.slice(4, 6), 16) + Math.floor(255 * factor));
+      return `rgb(${r}, ${g}, ${b})`;
     }
+    // Fallback: retorna a cor original se não conseguir processar
     return color;
   }
 
@@ -684,5 +600,45 @@ export class AnimationEngine {
       default:
         return 'Respire';
     }
+  }
+
+  // Garante que apenas o padrão Box Plus ativa o estilo Box
+  _isBoxBreathingPattern(pattern) {
+    // Considera o nome, mas pode ser expandido para lógica mais robusta
+    return pattern && pattern.name === 'Box Plus';
+  }
+
+  _drawLegacyAnimation(progress, currentPhase, phaseElapsed) {
+    // Animação Legacy: círculo pulsante simples (placeholder)
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.save();
+    this.ctx.globalAlpha = this.globalAlpha;
+    const centerX = this.canvas.width / 2;
+    const centerY = this.canvas.height / 2;
+    const minR = this.config.legacy.minRadius;
+    const maxR = this.config.legacy.maxRadius;
+    const baseColor = this._getPhaseColor(currentPhase.type);
+    // Raio pulsante
+    const radius = minR + (maxR - minR) * progress;
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    this.ctx.strokeStyle = baseColor;
+    this.ctx.lineWidth = this.config.legacy.strokeWidth;
+    this.ctx.shadowColor = baseColor;
+    this.ctx.shadowBlur = 8;
+    this.ctx.stroke();
+    // Bolinha central
+    const ballScale = this.config.legacy.ballMinScale + (this.config.legacy.ballMaxScale - this.config.legacy.ballMinScale) * progress;
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, 18 * ballScale, 0, 2 * Math.PI);
+    this.ctx.fillStyle = baseColor;
+    this.ctx.shadowColor = baseColor;
+    this.ctx.shadowBlur = 12;
+    this.ctx.fill();
+    this.ctx.restore();
+    // Texto central
+    this._drawCentralText(currentPhase, phaseElapsed, centerX, centerY);
+    this.ctx.restore();
   }
 }
